@@ -1042,6 +1042,26 @@ print(f"y_test shape: {y_test.shape}")
 # Now we'll train and evaluate models using both datasets,
 # always testing on the original imbalanced test data to reflect real-world conditions
 #%% md
+# # Model Building and Algorithm Selection
+# 
+# In this phase, we implemented a variety of machine learning algorithms from different families to predict heart disease risk. We strategically selected diverse algorithms that employ fundamentally different mathematical techniques. This approach allows us to:
+# 
+# 1. Assess how different learning paradigms perform on this specific healthcare problem
+# 2. Identify which modeling approach offers the best balance of precision and recall for heart disease detection
+# 3. Understand the trade-offs between interpretability and predictive power
+# 
+# We selected the following algorithms, each representing a different modeling family:
+# 
+# - **Logistic Regression**: A linear model that serves as our baseline and offers high interpretability
+# - **Random Forest**: An ensemble of decision trees that captures non-linear relationships and feature interactions
+# - **Neural Network (MLP)**: A deep learning approach that can model complex patterns without explicit feature engineering
+# - **XGBoost**: A gradient boosting framework that excels at structured data and usually achieves state-of-the-art performance on tabular datasets
+# - **Hierarchical Clustering**: An unsupervised learning approach to identify natural groupings in our dataset without using the target variable
+# 
+# Our presentation follows a logical progression from simpler to more complex algorithms, reflecting the historical development of machine learning techniques while also moving from highly interpretable models to more "black box" approaches. This pedagogical structure allows us to examine how increasing model complexity affects predictive performance, particularly for detecting the minority class (heart disease cases).
+# 
+# For each supervised algorithm, we trained and evaluated two versions: one using the original imbalanced dataset and another using SMOTE-balanced data. This allowed us to assess how class balancing affects each model's ability to identify heart disease cases, which is critical in healthcare applications where failing to detect a positive case could have serious consequences.
+#%% md
 # # Logistic Regression
 # Implement a logistic regression model as our baseline classifier for predicting heart disease, as it's effective for binary classification problems.
 # 
@@ -1158,155 +1178,6 @@ plt.show()
 #%% md
 # The Random Forest classifier demonstrates strong performance metrics with an overall accuracy of 0.92. For heart disease detection, it achieves a precision of 0.61 and recall of 0.15. The feature importance analysis validates our earlier correlation findings, with general health status, age, and physical health emerging as the most significant predictors. This aligns with medical understanding of heart disease risk factors.
 # 
-#%% md
-# # Hierarchical Clustering
-# - Perform hierarchical clustering to identify natural groupings in our health data, using Gower distance to handle mixed numeric and categorical variables.
-# - Creates 5 distinct clusters of patients
-# - Provides cluster sizes and characteristics
-# - Shows mean/mode values of features in each cluster
-# - Helps identify natural groupings of patients with similar health profiles
-#%%
-import pandas as pd
-from sklearn.cluster import AgglomerativeClustering
-from scipy.cluster.hierarchy import dendrogram, linkage
-import matplotlib.pyplot as plt
-from sklearn.metrics.pairwise import pairwise_distances
-from scipy.spatial.distance import squareform
-import numpy as np
-
-pd.set_option('future.no_silent_downcasting', True)
-
-# Check if X_train is a DataFrame or numpy array
-if isinstance(X_train, pd.DataFrame):
-    # If DataFrame, use .iloc for indexing
-    np.random.seed(42)
-    sample_indices = np.random.choice(len(X_train), size=5000, replace=False)
-    X_train_sample = X_train.iloc[sample_indices].values
-    y_train_sample = y_train.iloc[sample_indices].values if isinstance(y_train, pd.Series) else y_train[sample_indices]
-else:
-    # If numpy array, use direct indexing
-    np.random.seed(42)
-    sample_indices = np.random.choice(len(X_train), size=5000, replace=False)
-    X_train_sample = X_train[sample_indices]
-    y_train_sample = y_train[sample_indices]
-
-# Calculate distance matrix (using euclidean distance for symmetric matrix)
-distances_orig = pairwise_distances(X_train_sample, metric='euclidean')
-
-# Make sure the matrix is symmetric
-distances_orig = (distances_orig + distances_orig.T) / 2
-
-# Perform hierarchical clustering with 5 clusters
-n_clusters = 5
-cluster_orig = AgglomerativeClustering(n_clusters=n_clusters,
-                                 metric='precomputed',
-                                 linkage='complete')
-clusters_orig = cluster_orig.fit_predict(distances_orig)
-
-# Calculate heart disease rates by cluster
-df_results_orig = pd.DataFrame({
-    'Cluster': clusters_orig,
-    'HeartDisease': y_train_sample
-})
-heart_disease_by_cluster_orig = df_results_orig.groupby('Cluster')['HeartDisease'].mean() * 100
-
-# ---- Hierarchical Clustering on SMOTE Balanced Data ----
-# Sample the balanced dataset
-if isinstance(X_train_balanced, pd.DataFrame):
-    # If DataFrame, use .iloc for indexing
-    np.random.seed(42)
-    balanced_sample_indices = np.random.choice(len(X_train_balanced), size=5000, replace=False)
-    X_train_balanced_sample = X_train_balanced.iloc[balanced_sample_indices].values
-    y_train_balanced_sample = y_train_balanced.iloc[balanced_sample_indices].values if isinstance(y_train_balanced, pd.Series) else y_train_balanced[balanced_sample_indices]
-else:
-    # If numpy array, use direct indexing
-    np.random.seed(42)
-    balanced_sample_indices = np.random.choice(len(X_train_balanced), size=5000, replace=False)
-    X_train_balanced_sample = X_train_balanced[balanced_sample_indices]
-    y_train_balanced_sample = y_train_balanced[balanced_sample_indices]
-
-# Calculate distance matrix (using euclidean distance for symmetric matrix)
-distances_balanced = pairwise_distances(X_train_balanced_sample, metric='euclidean')
-
-# Make sure the matrix is symmetric
-distances_balanced = (distances_balanced + distances_balanced.T) / 2
-
-# Perform hierarchical clustering with 5 clusters
-cluster_balanced = AgglomerativeClustering(n_clusters=n_clusters,
-                                    metric='precomputed',
-                                    linkage='complete')
-clusters_balanced = cluster_balanced.fit_predict(distances_balanced)
-
-# Calculate heart disease rates by cluster
-df_results_bal = pd.DataFrame({
-    'Cluster': clusters_balanced,
-    'HeartDisease': y_train_balanced_sample
-})
-heart_disease_by_cluster_bal = df_results_bal.groupby('Cluster')['HeartDisease'].mean() * 100
-
-# ---- Create dendrograms -----
-# Prepare data for dendrograms
-condensed_dist_orig = squareform(distances_orig)
-linkage_matrix_orig = linkage(condensed_dist_orig, method='complete')
-
-condensed_dist_bal = squareform(distances_balanced)
-linkage_matrix_bal = linkage(condensed_dist_bal, method='complete')
-
-# Create dendrograms side by side
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 7))
-
-# Dendrogram before SMOTE (left)
-dendrogram(linkage_matrix_orig, ax=ax1)
-ax1.set_title('Hierarchical Clustering Dendrogram (Before SMOTE)')
-ax1.set_xlabel('Sample Index')
-ax1.set_ylabel('Distance')
-
-# Dendrogram after SMOTE (right)
-dendrogram(linkage_matrix_bal, ax=ax2)
-ax2.set_title('Hierarchical Clustering Dendrogram (After SMOTE)')
-ax2.set_xlabel('Sample Index')
-ax2.set_ylabel('Distance')
-
-plt.tight_layout()
-plt.show()
-
-# ---- Create heart disease rate graphs ----
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
-
-# Before SMOTE - left side
-bars_orig = ax1.bar(range(n_clusters), heart_disease_by_cluster_orig, color='skyblue')
-ax1.set_title('Heart Disease Rate by Cluster (Before SMOTE)')
-ax1.set_xlabel('Cluster')
-ax1.set_ylabel('Heart Disease Rate (%)')
-ax1.set_xticks(range(n_clusters))
-
-# Add percentage labels on bars
-for bar, percentage in zip(bars_orig, heart_disease_by_cluster_orig):
-    ax1.text(bar.get_x() + bar.get_width()/2.,
-            bar.get_height() + 0.5,
-            f'{percentage:.1f}%',
-            ha='center', va='bottom')
-
-# After SMOTE - right side
-bars_bal = ax2.bar(range(n_clusters), heart_disease_by_cluster_bal, color='skyblue')
-ax2.set_title('Heart Disease Rate by Cluster (After SMOTE)')
-ax2.set_xlabel('Cluster')
-ax2.set_ylabel('Heart Disease Rate (%)')
-ax2.set_xticks(range(n_clusters))
-
-# Add percentage labels on bars
-for bar, percentage in zip(bars_bal, heart_disease_by_cluster_bal):
-    ax2.text(bar.get_x() + bar.get_width()/2.,
-            bar.get_height() + 0.5,
-            f'{percentage:.1f}%',
-            ha='center', va='bottom')
-
-plt.tight_layout()
-plt.show()
-#%% md
-# Hierarchical clustering analysis of heart disease data revealed distinct patient groups based on health characteristics. Before SMOTE balancing, clusters showed moderate differences in disease rates (6.5%-42.1%), with one cluster identifying higher-risk patients. After SMOTE, disease prevalence increased dramatically across all clusters (42.5%-100%), with one cluster containing only heart disease cases.
-# The bottom graphs display heart disease rates in each cluster - the left graph shows the original data with lower rates reflecting the natural imbalance in the data, while the right graph presents the disease distribution after SMOTE with significantly higher values highlighting how the balancing technique enables better identification of risk groups.
-# The dendrograms illustrate the hierarchical cluster structure and demonstrate how data balancing affects natural grouping. This unsupervised analysis complements our supervised models by identifying natural relationships between features, allowing more targeted approaches to heart disease prevention.
 #%% md
 # # Neural Network
 #%% md
@@ -1463,7 +1334,221 @@ plt.show()
 # 
 # Compared to other models in the study, the neural network demonstrates heightened sensitivity to data balancing techniques, a characteristic that distinguishes this algorithm family. While models like Random Forest showed only moderate improvement after SMOTE, the neural network responded much more dramatically. This phenomenon stems from the unique architecture of neural networks, allowing them to learn complex patterns and relationships between variables. With balanced data, the network better learned heart disease characteristics, though with a tendency toward overgeneralization. In the medical context of heart disease detection, the SMOTE-enhanced model may be preferred using a "better safe than sorry" approach, as it identifies more potential cases, even at the cost of false alarms. The flexibility and ability of neural networks to learn complex, non-linear patterns make them a valuable tool in health data analysis, but require careful tuning of hyperparameters and data balancing techniques.
 #%% md
+# # XGBoost
+# Implement an XGBoost classifier which uses gradient boosting with decision trees. This advanced algorithm combines multiple weak prediction models to create a stronger predictive model, with regularization techniques to prevent overfitting. XGBoost is known for its performance, speed, and ability to handle complex patterns.
+# 
+# 
+#%%
+from xgboost import XGBClassifier
+from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Train on original data
+xgb_orig = XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
+xgb_orig.fit(X_train, y_train)
+y_pred_orig = xgb_orig.predict(X_test)
+
+# Train on balanced data
+xgb_balanced = XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
+xgb_balanced.fit(X_train_balanced, y_train_balanced)
+y_pred_balanced = xgb_balanced.predict(X_test)
+
+# Compare results
+print("XGBoost Results:")
+print("\nBefore SMOTE:")
+print(classification_report(y_test, y_pred_orig))
+
+print("\nAfter SMOTE:")
+print(classification_report(y_test, y_pred_balanced))
+
+# Create simple bar chart comparison for heart disease detection (class 1)
+metrics = ['Precision', 'Recall', 'F1-Score']
+before_values = [
+    precision_score(y_test, y_pred_orig, pos_label=1),
+    recall_score(y_test, y_pred_orig, pos_label=1),
+    f1_score(y_test, y_pred_orig, pos_label=1)
+]
+after_values = [
+    precision_score(y_test, y_pred_balanced, pos_label=1),
+    recall_score(y_test, y_pred_balanced, pos_label=1),
+    f1_score(y_test, y_pred_balanced, pos_label=1)
+]
+
+# Simple bar chart
+plt.figure(figsize=(8, 5))
+x = np.arange(len(metrics))
+width = 0.35
+
+plt.bar(x - width / 2, before_values, width, label='Before SMOTE')
+plt.bar(x + width / 2, after_values, width, label='After SMOTE')
+
+plt.ylabel('Score')
+plt.title('Heart Disease Detection Performance')
+plt.xticks(x, metrics)
+plt.legend()
+plt.ylim(0, 1)
+
+plt.show()
+#%% md
+# The XGBoost model demonstrated a pattern similar to other models, with significant improvement in heart disease detection after balancing the data using SMOTE. Before SMOTE, the model achieved high overall accuracy (0.91) but struggled to identify heart disease cases with very low recall of 0.08, though precision for positive cases was relatively good (0.57). After data balancing with SMOTE, there was a substantial change in performance: the recall for heart disease detection dramatically increased to 0.61 (a 7.6-fold improvement), but at the cost of reduced precision to 0.22.
+# 
+# These results highlight XGBoost's strong ability to learn from balanced data, as it shows a better balance between precision and recall compared to Random Forest, which achieved lower recall (0.23) but higher precision (0.30). XGBoost demonstrates better recall than Random Forest but lower than the high recall of the Logistic Regression model (0.77), positioning it as a middle-ground solution in terms of heart disease detection capability.
+# 
+# The F1-score of 0.33 (after SMOTE) indicates a significant improvement compared to 0.14 (before SMOTE), demonstrating the importance of addressing data imbalance. In summary, XGBoost offers an advanced boosting approach that provides a good balance between identifying heart disease cases and minimizing false alarms, making it a valuable addition to the range of models in the project.
+#%% md
+# # Hierarchical Clustering
+# - Perform hierarchical clustering to identify natural groupings in our health data, using Gower distance to handle mixed numeric and categorical variables.
+# - Creates 5 distinct clusters of patients
+# - Provides cluster sizes and characteristics
+# - Shows mean/mode values of features in each cluster
+# - Helps identify natural groupings of patients with similar health profiles
+#%%
+import pandas as pd
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
+from sklearn.metrics.pairwise import pairwise_distances
+from scipy.spatial.distance import squareform
+import numpy as np
+
+pd.set_option('future.no_silent_downcasting', True)
+
+# Check if X_train is a DataFrame or numpy array
+if isinstance(X_train, pd.DataFrame):
+    # If DataFrame, use .iloc for indexing
+    np.random.seed(42)
+    sample_indices = np.random.choice(len(X_train), size=5000, replace=False)
+    X_train_sample = X_train.iloc[sample_indices].values
+    y_train_sample = y_train.iloc[sample_indices].values if isinstance(y_train, pd.Series) else y_train[sample_indices]
+else:
+    # If numpy array, use direct indexing
+    np.random.seed(42)
+    sample_indices = np.random.choice(len(X_train), size=5000, replace=False)
+    X_train_sample = X_train[sample_indices]
+    y_train_sample = y_train[sample_indices]
+
+# Calculate distance matrix (using euclidean distance for symmetric matrix)
+distances_orig = pairwise_distances(X_train_sample, metric='euclidean')
+
+# Make sure the matrix is symmetric
+distances_orig = (distances_orig + distances_orig.T) / 2
+
+# Perform hierarchical clustering with 5 clusters
+n_clusters = 5
+cluster_orig = AgglomerativeClustering(n_clusters=n_clusters,
+                                 metric='precomputed',
+                                 linkage='complete')
+clusters_orig = cluster_orig.fit_predict(distances_orig)
+
+# Calculate heart disease rates by cluster
+df_results_orig = pd.DataFrame({
+    'Cluster': clusters_orig,
+    'HeartDisease': y_train_sample
+})
+heart_disease_by_cluster_orig = df_results_orig.groupby('Cluster')['HeartDisease'].mean() * 100
+
+# ---- Hierarchical Clustering on SMOTE Balanced Data ----
+# Sample the balanced dataset
+if isinstance(X_train_balanced, pd.DataFrame):
+    # If DataFrame, use .iloc for indexing
+    np.random.seed(42)
+    balanced_sample_indices = np.random.choice(len(X_train_balanced), size=5000, replace=False)
+    X_train_balanced_sample = X_train_balanced.iloc[balanced_sample_indices].values
+    y_train_balanced_sample = y_train_balanced.iloc[balanced_sample_indices].values if isinstance(y_train_balanced, pd.Series) else y_train_balanced[balanced_sample_indices]
+else:
+    # If numpy array, use direct indexing
+    np.random.seed(42)
+    balanced_sample_indices = np.random.choice(len(X_train_balanced), size=5000, replace=False)
+    X_train_balanced_sample = X_train_balanced[balanced_sample_indices]
+    y_train_balanced_sample = y_train_balanced[balanced_sample_indices]
+
+# Calculate distance matrix (using euclidean distance for symmetric matrix)
+distances_balanced = pairwise_distances(X_train_balanced_sample, metric='euclidean')
+
+# Make sure the matrix is symmetric
+distances_balanced = (distances_balanced + distances_balanced.T) / 2
+
+# Perform hierarchical clustering with 5 clusters
+cluster_balanced = AgglomerativeClustering(n_clusters=n_clusters,
+                                    metric='precomputed',
+                                    linkage='complete')
+clusters_balanced = cluster_balanced.fit_predict(distances_balanced)
+
+# Calculate heart disease rates by cluster
+df_results_bal = pd.DataFrame({
+    'Cluster': clusters_balanced,
+    'HeartDisease': y_train_balanced_sample
+})
+heart_disease_by_cluster_bal = df_results_bal.groupby('Cluster')['HeartDisease'].mean() * 100
+
+# ---- Create dendrograms -----
+# Prepare data for dendrograms
+condensed_dist_orig = squareform(distances_orig)
+linkage_matrix_orig = linkage(condensed_dist_orig, method='complete')
+
+condensed_dist_bal = squareform(distances_balanced)
+linkage_matrix_bal = linkage(condensed_dist_bal, method='complete')
+
+# Create dendrograms side by side
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 7))
+
+# Dendrogram before SMOTE (left)
+dendrogram(linkage_matrix_orig, ax=ax1)
+ax1.set_title('Hierarchical Clustering Dendrogram (Before SMOTE)')
+ax1.set_xlabel('Sample Index')
+ax1.set_ylabel('Distance')
+
+# Dendrogram after SMOTE (right)
+dendrogram(linkage_matrix_bal, ax=ax2)
+ax2.set_title('Hierarchical Clustering Dendrogram (After SMOTE)')
+ax2.set_xlabel('Sample Index')
+ax2.set_ylabel('Distance')
+
+plt.tight_layout()
+plt.show()
+
+# ---- Create heart disease rate graphs ----
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
+
+# Before SMOTE - left side
+bars_orig = ax1.bar(range(n_clusters), heart_disease_by_cluster_orig, color='skyblue')
+ax1.set_title('Heart Disease Rate by Cluster (Before SMOTE)')
+ax1.set_xlabel('Cluster')
+ax1.set_ylabel('Heart Disease Rate (%)')
+ax1.set_xticks(range(n_clusters))
+
+# Add percentage labels on bars
+for bar, percentage in zip(bars_orig, heart_disease_by_cluster_orig):
+    ax1.text(bar.get_x() + bar.get_width()/2.,
+            bar.get_height() + 0.5,
+            f'{percentage:.1f}%',
+            ha='center', va='bottom')
+
+# After SMOTE - right side
+bars_bal = ax2.bar(range(n_clusters), heart_disease_by_cluster_bal, color='skyblue')
+ax2.set_title('Heart Disease Rate by Cluster (After SMOTE)')
+ax2.set_xlabel('Cluster')
+ax2.set_ylabel('Heart Disease Rate (%)')
+ax2.set_xticks(range(n_clusters))
+
+# Add percentage labels on bars
+for bar, percentage in zip(bars_bal, heart_disease_by_cluster_bal):
+    ax2.text(bar.get_x() + bar.get_width()/2.,
+            bar.get_height() + 0.5,
+            f'{percentage:.1f}%',
+            ha='center', va='bottom')
+
+plt.tight_layout()
+plt.show()
+#%% md
+# Hierarchical clustering analysis of heart disease data revealed distinct patient groups based on health characteristics. Before SMOTE balancing, clusters showed moderate differences in disease rates (6.5%-42.1%), with one cluster identifying higher-risk patients. After SMOTE, disease prevalence increased dramatically across all clusters (42.5%-100%), with one cluster containing only heart disease cases.
+# The bottom graphs display heart disease rates in each cluster - the left graph shows the original data with lower rates reflecting the natural imbalance in the data, while the right graph presents the disease distribution after SMOTE with significantly higher values highlighting how the balancing technique enables better identification of risk groups.
+# The dendrograms illustrate the hierarchical cluster structure and demonstrate how data balancing affects natural grouping. This unsupervised analysis complements our supervised models by identifying natural relationships between features, allowing more targeted approaches to heart disease prevention.
+#%% md
 # # Comparing the Models
+# After training multiple models from different algorithm families, we observed distinct patterns in their performance characteristics. The figure below compares the precision, recall, and F1-score for heart disease detection across all models after SMOTE balancing.
+# 
 #%%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -1471,14 +1556,14 @@ import seaborn as sns
 
 # Create DataFrame with model performance metrics after SMOTE
 metrics_data = {
-    'Model': ['Logistic Regression', 'Random Forest', 'Neural Network'],
-    'Accuracy': [0.74, 0.89, 0.74],
-    'Precision (No HD)': [0.97, 0.93, 0.97],
-    'Recall (No HD)': [0.73, 0.95, 0.73],
-    'F1 (No HD)': [0.84, 0.94, 0.83],
-    'Precision (HD)': [0.22, 0.30, 0.22],
-    'Recall (HD)': [0.77, 0.23, 0.76],
-    'F1 (HD)': [0.34, 0.26, 0.34]
+    'Model': ['Logistic Regression', 'Random Forest', 'Neural Network', 'XGBoost'],
+    'Accuracy': [0.74, 0.89, 0.74, 0.78],
+    'Precision (No HD)': [0.97, 0.93, 0.97, 0.96],
+    'Recall (No HD)': [0.73, 0.95, 0.73, 0.80],
+    'F1 (No HD)': [0.84, 0.94, 0.83, 0.87],
+    'Precision (HD)': [0.22, 0.30, 0.22, 0.22],
+    'Recall (HD)': [0.77, 0.23, 0.76, 0.61],
+    'F1 (HD)': [0.34, 0.26, 0.34, 0.33]
 }
 
 metrics_df = pd.DataFrame(metrics_data)
@@ -1504,16 +1589,21 @@ plt.legend(title='Metric', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 plt.show()
 #%% md
-# When comparing the models' performance after SMOTE balancing, Random Forest emerged as the best performer with 0.89 accuracy and the highest precision (0.30) for heart disease cases. However, Logistic Regression and Neural Network achieved significantly higher recall (0.77 and 0.76 respectively) for heart disease cases, though with lower precision (0.22). This trade-off resulted in higher F1 scores (0.34) for heart disease detection in both Logistic Regression and Neural Network models compared to Random Forest (0.26).
+# # Model Summary and Analysis
 # 
-# Despite applying SMOTE to address class imbalance, all models still showed better performance for non-heart disease cases (F1 scores between 0.83-0.94) compared to heart disease cases (F1 scores between 0.26-0.34). This indicates that while SMOTE improved the models' ability to detect heart disease cases, the challenge of identifying the minority class remains. The choice between models would depend on whether higher precision (Random Forest) or higher recall (Logistic Regression/Neural Network) is more important for the specific application of heart disease prediction.
-#%% md
-# # Summary of Model Building and Training
-# In the modeling stage, we developed and compared four different models for predicting heart disease, while addressing the challenge of data imbalance (91.4% without heart disease versus 8.6% with heart disease) using SMOTE.
+# When comparing the models' performance after SMOTE balancing, we observed distinct patterns in how these diverse algorithm families approach the heart disease prediction task.
 # 
-# Our logistic regression demonstrated how data balancing dramatically improves the ability to identify heart disease cases, with an increase in sensitivity from 0.09 to 0.77, despite a decrease in precision from 0.51 to 0.22. The Random Forest model achieved the highest overall accuracy (0.89 after SMOTE) with a precision of 0.30 and sensitivity of 0.23 for heart disease cases. Hierarchical analysis identified natural clusters of patients with different heart disease rates, with SMOTE significantly increasing the representation of heart disease in all clusters. Our neural network exhibited sensitivity similar to logistic regression (0.76) after SMOTE, but with low precision (0.22).
+# Random Forest emerged as the best performer in terms of overall accuracy (0.89) and achieved the highest precision (0.30) for heart disease cases, making it the most cautious in labeling patients as having heart disease. However, Logistic Regression and Neural Network demonstrated significantly higher recall (0.77 and 0.76 respectively) for heart disease cases, though with lower precision (0.22). This trade-off resulted in higher F1 scores (0.34) for heart disease detection in both Logistic Regression and Neural Network models compared to Random Forest (0.26).
 # 
-# All models performed better for cases without heart disease (F1 between 0.83-0.94) compared to cases with heart disease (F1 between 0.26-0.34), even after data balancing. The choice of the optimal model depends on priorities: Random Forest offers the best balance between precision and sensitivity, while the other models offer higher sensitivity at the cost of lower precision.
+# XGBoost offered a unique middle ground with moderate recall (0.61) and precision (0.22), resulting in an F1 score (0.33) almost matching the best performers. This balance between identifying cases and limiting false alarms positions XGBoost as a compelling compromise model when both sensitivity and specificity are important considerations.
+# 
+# Despite applying SMOTE to address class imbalance, all models still showed better performance for non-heart disease cases (F1 scores between 0.83-0.94) compared to heart disease cases (F1 scores between 0.26-0.34). This indicates that while SMOTE improved the models' ability to detect heart disease cases, the challenge of identifying the minority class remains significant.
+# 
+# Our analysis reveals that these diverse modeling approaches capture different aspects of the heart disease prediction problem. The linear approach (Logistic Regression) and neural network, despite their fundamentally different mathematical foundations, showed remarkably similar performance characteristics. Meanwhile, tree-based methods (Random Forest and XGBoost) demonstrated varying trade-offs between precision and recall, with XGBoost finding a more balanced position.
+# 
+# The hierarchical clustering analysis complemented our supervised models by revealing natural risk groupings with varying heart disease rates across clusters. This unsupervised perspective provided additional insights into how patients naturally group based on their health characteristics, potentially identifying subpopulations with distinct risk profiles.
+# 
+# The choice between these models ultimately depends on the specific clinical context and priorities: whether identifying as many potential heart disease cases as possible (high recall with Logistic Regression/Neural Network), minimizing false alarms (higher precision with Random Forest), or finding a balanced approach (XGBoost) is more important for heart disease risk assessment.
 #%% md
 # # Interpretability of the Models
 # 
@@ -1544,6 +1634,73 @@ shap_values = explainer(X_test_df)
 shap.plots.beeswarm(shap_values)
 #%% md
 # The plot above sorts features by the sum of SHAP value magnitudes over all samples, and uses these values to show the distribution of impacts each feature has on the model output. Colors represent the feature value (red high, blue low). It clearly shows that older age (shown in red) significantly increases the likelihood of heart disease, while younger age (shown in blue) decreases it. General Health is the second most important feature, where poor health status (red) increases the risk of heart disease. Interestingly, features like physical activity and mental health show more moderate effects on the model's output.
+#%% md
+# ## Enhancing SHAP Analysis: Case-Specific Investigation
+# So far, we performed basic SHAP analysis showing the overall feature importance in our model, as seen in the summary plot. This analysis provided general insights regarding the impact of each feature, identifying age category, general health status, sex, smoking, and stroke history as the most influential predictors for heart disease.
+# However, this general analysis doesn't explain how the model arrives at decisions for specific cases. To deepen our understanding and examine the model's decision-making process at the individual level, we'll now extend our SHAP analysis using Waterfall plots.
+# 
+# We'll select four representative cases from our test set:
+# 
+# True Positive: A patient with heart disease correctly identified by the model
+# True Negative: A patient without heart disease correctly identified
+# False Positive: A patient without heart disease incorrectly classified as having heart disease
+# False Negative: A patient with heart disease the model failed to identify
+# 
+# For each case, we'll calculate specific SHAP values and create a Waterfall plot showing how each feature contributed to the final prediction.
+#%%
+# Code to generate SHAP waterfall plots for specific cases
+
+# 1. Find examples of each prediction type
+results_df = pd.DataFrame({
+    'True_Label': y_test,
+    'Predicted': y_pred
+})
+
+# Add prediction probabilities if available
+# (If using XGBoost, Random Forest, or other model that provides probabilities)
+if hasattr(model, 'predict_proba'):
+    results_df['Probability'] = model.predict_proba(X_test)[:, 1]
+else:
+    # If probabilities aren't available, just use predictions
+    results_df['Probability'] = y_pred
+
+# Find indices for specific case types
+true_positive = results_df[(results_df['True_Label'] == 1) & (results_df['Predicted'] == 1)].index[0]
+true_negative = results_df[(results_df['True_Label'] == 0) & (results_df['Predicted'] == 0)].index[0]
+false_positive = results_df[(results_df['True_Label'] == 0) & (results_df['Predicted'] == 1)].index[0]
+false_negative = results_df[(results_df['True_Label'] == 1) & (results_df['Predicted'] == 0)].index[0]
+
+# Create a list of cases to analyze with labels
+case_indices = [true_positive, true_negative, false_positive, false_negative]
+case_labels = ['True Positive', 'True Negative', 'False Positive', 'False Negative']
+
+# Create the explainer if not already created
+if 'explainer' not in locals():
+    explainer = shap.Explainer(model)
+
+# Plot waterfall plots for each case
+plt.figure(figsize=(20, 15))
+for i, idx in enumerate(case_indices):
+    plt.subplot(2, 2, i+1)
+
+    # Get SHAP values for this specific instance
+    shap_values = explainer(X_test.iloc[idx:idx+1, :])
+    case_shap = shap_values[0]
+
+    # Create waterfall plot
+    shap.plots.waterfall(case_shap, max_display=10, show=False)
+
+    # Add title with case information
+    true_label = "Has Heart Disease" if y_test.iloc[idx] == 1 else "No Heart Disease"
+    pred_label = "Has Heart Disease" if results_df['Predicted'].iloc[idx] == 1 else "No Heart Disease"
+    prob = results_df['Probability'].iloc[idx] * 100
+
+    plt.title(f'Case Analysis: {case_labels[i]}\n'
+             f'True Label: {true_label}, Prediction: {pred_label}, Probability: {prob:.1f}%',
+             fontsize=12)
+
+plt.tight_layout()
+plt.show()
 #%% md
 # # Summary and Thoughts for the future and Final Taught
 # In this study, we embarked on a data-driven journey to uncover the underlying factors contributing to heart disease risk. Beginning with a comprehensive dataset containing various lifestyle and health attributes, we carefully preprocessed the data to ensure consistency and accuracy. This involved encoding categorical variables, organizing age groups into meaningful ranges, and transforming binary responses for better analysis. We also handled missing values, normalized numerical features, and engineered new variables to enhance model performance. For instance, age groups were restructured into broader 10-year ranges to capture more meaningful patterns, and binary health indicators such as smoking, alcohol consumption, and physical activity were mapped to numerical values. With a structured dataset in place, we conducted exploratory data analysis through visualizations, revealing key trends and correlations between lifestyle choices and heart disease prevalence.
