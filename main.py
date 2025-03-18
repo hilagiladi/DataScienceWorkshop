@@ -705,16 +705,16 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
 # First, reload the dataset
-df = pd.read_csv('heart_2020_cleaned.csv')
+df_visualization = pd.read_csv('heart_2020_cleaned.csv')
 
 plt.close('all')
 
 # Convert HeartDisease column to consistent Yes/No strings
-df['HeartDisease'] = df['HeartDisease'].map({'Yes': 'Yes', 'No': 'No'})
+df_visualization['HeartDisease'] = df_visualization['HeartDisease'].map({'Yes': 'Yes', 'No': 'No'})
 
 # Sample the data since plotting all points would be overwhelming
 sample_size = 5000  # Adjust sample size as needed
-df_sampled = df.sample(n=sample_size, random_state=42)
+df_sampled = df_visualization.sample(n=sample_size, random_state=42)
 
 # Normalize features to 0-1 range for better visualization
 scaler = MinMaxScaler()
@@ -781,7 +781,7 @@ sns.violinplot(x="Asthma", y="PhysicalHealth", hue="HeartDisease", data=df)
 plt.title('Distribution of Physical Health Issues across Asthma and Heart Disease Status')
 plt.xlabel('Asthma Status')
 plt.ylabel('Physical Health Issues (days)')
-plt.show()
+plt.show() #todo - change text
 #%% md
 # The violin plot demonstrates the complex relationship between physical health issues, asthma, and heart disease. The plot shows that individuals with heart disease (shown in brown) consistently experience more days of poor physical health compared to those without heart disease (blue), regardless of their asthma status. Among those with heart disease, the distribution is wider and shows a higher concentration of days with physical health problems. When looking at asthma's impact, asthmatic individuals display more symmetrical and concentrated distributions of physical health issues, while non-asthmatics show more spread in their patterns. The combined presence of both conditions appears to have a compounding effect, with individuals having both heart disease and asthma showing the highest concentration of physical health issues, while those with neither condition report the fewest days of poor physical health. These patterns align with the correlation matrix findings, where heart disease showed a stronger correlation with physical health (0.17) compared to asthma's weaker correlation (0.04), indicating that heart disease has a more significant impact on physical health than asthma.
 #%% md
@@ -974,12 +974,13 @@ for col in df.columns:
         # Explicit mapping for binary columns
         if set(df[col].unique()).issubset({'Yes', 'No'}):
             df[col] = df[col].map({'Yes': 1, 'No': 0})
-            print(f"Converted binary column: {col}")
         else:
             # LabelEncoder for other categorical columns
             le = LabelEncoder()
             df[col] = le.fit_transform(df[col])
-            print(f"Converted categorical column: {col}")
+
+# Making sure that we deleted those columns
+df = df.drop(['Race', 'SleepTime'], axis=1, errors='ignore')
 
 # Prepare features and target
 X = df.drop('HeartDisease', axis=1)
@@ -987,7 +988,6 @@ y = df['HeartDisease']
 
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
 #%% md
 # ## Apply SMOTE to Training Data
 #%%
@@ -1014,7 +1014,6 @@ sns.countplot(x=y_train_balanced, palette='Set2')
 plt.title('Heart Disease Distribution After SMOTE')
 plt.xlabel('Heart Disease')
 plt.ylabel('Count')
-
 plt.tight_layout()
 plt.show()
 #%% md
@@ -1343,7 +1342,6 @@ from xgboost import XGBClassifier
 from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
 import numpy as np
-
 # Train on original data
 xgb_orig = XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42)
 xgb_orig.fit(X_train, y_train)
@@ -1557,14 +1555,16 @@ import seaborn as sns
 # Create DataFrame with model performance metrics after SMOTE
 metrics_data = {
     'Model': ['Logistic Regression', 'Random Forest', 'Neural Network', 'XGBoost'],
-    'Accuracy': [0.74, 0.89, 0.74, 0.78],
-    'Precision (No HD)': [0.97, 0.93, 0.97, 0.96],
-    'Recall (No HD)': [0.73, 0.95, 0.73, 0.80],
-    'F1 (No HD)': [0.84, 0.94, 0.83, 0.87],
-    'Precision (HD)': [0.22, 0.30, 0.22, 0.22],
-    'Recall (HD)': [0.77, 0.23, 0.76, 0.61],
-    'F1 (HD)': [0.34, 0.26, 0.34, 0.33]
+    'Accuracy': [0.70, 0.82, None, 0.73],
+    'Precision (No HD)': [0.97, 0.93, None, 0.97],
+    'Recall (No HD)': [0.70, 0.87, None, 0.73],
+    'F1 (No HD)': [0.81, 0.90, None, 0.83],
+    'Precision (HD)': [0.19, 0.20, None, 0.20],
+    'Recall (HD)': [0.73, 0.35, None, 0.73],
+    'F1 (HD)': [0.30, 0.26, None, 0.32]
 }
+
+
 
 metrics_df = pd.DataFrame(metrics_data)
 
@@ -1593,17 +1593,22 @@ plt.show()
 # 
 # When comparing the models' performance after SMOTE balancing, we observed distinct patterns in how these diverse algorithm families approach the heart disease prediction task.
 # 
-# Random Forest emerged as the best performer in terms of overall accuracy (0.89) and achieved the highest precision (0.30) for heart disease cases, making it the most cautious in labeling patients as having heart disease. However, Logistic Regression and Neural Network demonstrated significantly higher recall (0.77 and 0.76 respectively) for heart disease cases, though with lower precision (0.22). This trade-off resulted in higher F1 scores (0.34) for heart disease detection in both Logistic Regression and Neural Network models compared to Random Forest (0.26).
+# **__Random Forest__** emerged as the best performer in terms of overall accuracy (**0.90**), but its precision for heart disease cases dropped to **0.23**, making it less cautious in labeling patients as having heart disease than initially thought. While it still maintains a relatively high F1-score (**0.27**), it no longer leads in balancing precision and recall.
 # 
-# XGBoost offered a unique middle ground with moderate recall (0.61) and precision (0.22), resulting in an F1 score (0.33) almost matching the best performers. This balance between identifying cases and limiting false alarms positions XGBoost as a compelling compromise model when both sensitivity and specificity are important considerations.
+# **__Logistic Regression__** demonstrated a recall of **0.70** for heart disease cases, making it effective at identifying positive cases, though with a low precision of **0.18**. This trade-off resulted in an F1-score of **0.29**, showing that it prioritizes detecting heart disease cases at the cost of more false positives.
 # 
-# Despite applying SMOTE to address class imbalance, all models still showed better performance for non-heart disease cases (F1 scores between 0.83-0.94) compared to heart disease cases (F1 scores between 0.26-0.34). This indicates that while SMOTE improved the models' ability to detect heart disease cases, the challenge of identifying the minority class remains significant.
+# **__Neural Network__** saw a significant drop in recall (**0.58**, down from 0.76 in previous results), reducing its effectiveness in identifying heart disease cases. While it maintains a relatively high precision (**0.20**) compared to **__Logistic Regression__**, its F1-score (**0.30**) suggests it is no longer as competitive in recall-driven scenarios.
 # 
-# Our analysis reveals that these diverse modeling approaches capture different aspects of the heart disease prediction problem. The linear approach (Logistic Regression) and neural network, despite their fundamentally different mathematical foundations, showed remarkably similar performance characteristics. Meanwhile, tree-based methods (Random Forest and XGBoost) demonstrated varying trade-offs between precision and recall, with XGBoost finding a more balanced position.
+# **__XGBoost__** provided the best balance between precision (**0.22**) and recall (**0.61**), resulting in an F1-score (**0.33**) that closely matches the top performers. This makes it a strong compromise model when balancing sensitivity and specificity is crucial.
 # 
-# The hierarchical clustering analysis complemented our supervised models by revealing natural risk groupings with varying heart disease rates across clusters. This unsupervised perspective provided additional insights into how patients naturally group based on their health characteristics, potentially identifying subpopulations with distinct risk profiles.
+# Despite applying SMOTE to address class imbalance, all models still showed significantly better performance for non-heart disease cases (**F1 scores between 0.81-0.92**) compared to heart disease cases (**F1 scores between 0.27-0.33**). While SMOTE improved recall for heart disease cases, the challenge of accurately detecting them remains.
 # 
-# The choice between these models ultimately depends on the specific clinical context and priorities: whether identifying as many potential heart disease cases as possible (high recall with Logistic Regression/Neural Network), minimizing false alarms (higher precision with Random Forest), or finding a balanced approach (XGBoost) is more important for heart disease risk assessment.
+# Our analysis reveals that these diverse modeling approaches capture different aspects of the heart disease prediction problem. The linear approach (**__Logistic Regression__**) remains useful for maximizing recall, while **__Neural Network__** is now less competitive. Tree-based methods (**__Random Forest__** and **__XGBoost__**) demonstrate varying trade-offs between precision and recall, with **__XGBoost__** emerging as the most balanced option.
+# 
+# Ultimately, the choice between these models depends on clinical priorities:
+# - **If maximizing recall is most important** → **__Logistic Regression__** (0.70 recall) is preferable.
+# - **If balancing precision and recall is key** → **__XGBoost__** (F1-score 0.33) is the best choice.
+# - **If prioritizing high accuracy and minimizing false positives** → **__Random Forest__** is a safer option.
 #%% md
 # # Interpretability of the Models
 # 
@@ -1611,24 +1616,31 @@ plt.show()
 # After testing and comparing different classification models for heart disease prediction, we want to understand which variables most significantly influenced our models' behavior. To gain deeper insights, we'll use SHAP (SHapley Additive exPlanations) values, which provide a sophisticated way to interpret machine learning models.
 #%%
 import shap
-import tqdm
-from sklearn.ensemble import GradientBoostingClassifier
+import os
+import warnings
+import sys
 
-# Disable progress bars
-tqdm.tqdm = lambda *args, **kwargs: (args[0] if args else None)
+# Disable all warnings
+warnings.filterwarnings('ignore')
+
+# Redirect stdout temporarily to suppress progress output
+original_stdout = sys.stdout
+sys.stdout = open(os.devnull, 'w')
+
+# Disable kmeans iterations display
 shap.utils._legacy.kmeans.kmeans = lambda X, k, **kwargs: (X[:k], None)
 
+try:
+    # Convert X_test back to DataFrame with column names
+    X_test_df = pd.DataFrame(X_test, columns=X.columns)
 
-# Convert X_test back to DataFrame with column names
-X_test_df = pd.DataFrame(X_test, columns=X.columns)
-
-# Train a Gradient Boosting model on our existing data
-gb_model = GradientBoostingClassifier(random_state=42)
-gb_model.fit(X_train, y_train)
-
-# Create SHAP explainer
-explainer = shap.Explainer(gb_model, X_test_df)
-shap_values = explainer(X_test_df)
+    # Create SHAP explainer without verbose parameter
+    explainer = shap.Explainer(xgb_balanced, X_test_df)
+    shap_values = explainer(X_test_df)
+finally:
+    # Restore stdout
+    sys.stdout.close()
+    sys.stdout = original_stdout
 
 # Create beeswarm plot
 shap.plots.beeswarm(shap_values)
@@ -1648,59 +1660,123 @@ shap.plots.beeswarm(shap_values)
 # 
 # For each case, we'll calculate specific SHAP values and create a Waterfall plot showing how each feature contributed to the final prediction.
 #%%
-# Code to generate SHAP waterfall plots for specific cases
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import shap
+import warnings
+import matplotlib as mpl
 
-# 1. Find examples of each prediction type
+# Suppress warnings
+warnings.filterwarnings("ignore")
+
+# Predictions using existing balanced model
+y_pred = xgb_balanced.predict(X_test)
+y_pred_proba = xgb_balanced.predict_proba(X_test)[:, 1]
+
+# Create results DataFrame
 results_df = pd.DataFrame({
-    'True_Label': y_test,
-    'Predicted': y_pred
+    'True_Label': y_test.values,
+    'Predicted': y_pred,
+    'Probability': y_pred_proba
 })
 
-# Add prediction probabilities if available
-# (If using XGBoost, Random Forest, or other model that provides probabilities)
-if hasattr(model, 'predict_proba'):
-    results_df['Probability'] = model.predict_proba(X_test)[:, 1]
-else:
-    # If probabilities aren't available, just use predictions
-    results_df['Probability'] = y_pred
+# Find representative cases
+true_positive_indices = results_df[(results_df['True_Label'] == 1) & (results_df['Predicted'] == 1)].index
+true_positive = true_positive_indices[0] if len(true_positive_indices) > 0 else None
 
-# Find indices for specific case types
-true_positive = results_df[(results_df['True_Label'] == 1) & (results_df['Predicted'] == 1)].index[0]
-true_negative = results_df[(results_df['True_Label'] == 0) & (results_df['Predicted'] == 0)].index[0]
-false_positive = results_df[(results_df['True_Label'] == 0) & (results_df['Predicted'] == 1)].index[0]
-false_negative = results_df[(results_df['True_Label'] == 1) & (results_df['Predicted'] == 0)].index[0]
+true_negative_indices = results_df[(results_df['True_Label'] == 0) & (results_df['Predicted'] == 0)].index
+true_negative = true_negative_indices[0] if len(true_negative_indices) > 0 else None
 
-# Create a list of cases to analyze with labels
-case_indices = [true_positive, true_negative, false_positive, false_negative]
-case_labels = ['True Positive', 'True Negative', 'False Positive', 'False Negative']
+false_positive_indices = results_df[(results_df['True_Label'] == 0) & (results_df['Predicted'] == 1)].index
+false_positive = false_positive_indices[0] if len(false_positive_indices) > 0 else None
 
-# Create the explainer if not already created
-if 'explainer' not in locals():
-    explainer = shap.Explainer(model)
+false_negative_indices = results_df[(results_df['True_Label'] == 1) & (results_df['Predicted'] == 0)].index
+false_negative = false_negative_indices[0] if len(false_negative_indices) > 0 else None
 
-# Plot waterfall plots for each case
-plt.figure(figsize=(20, 15))
+# Collect case indices and labels
+case_indices = [idx for idx in [true_positive, true_negative, false_positive, false_negative] if idx is not None]
+case_labels = ['True Positive', 'True Negative', 'False Positive', 'False Negative'][:len(case_indices)]
+
+# Create SHAP explainer
+X_test_df = pd.DataFrame(X_test.reset_index(drop=True), columns=X.columns)
+explainer = shap.TreeExplainer(xgb_balanced)
+
+# Define consistent figure size for all plots - making wider to handle the left margin
+fixed_figsize = (6.5, 3.5)
+
+# Set consistent values for all plots
+border_width = 2
+border_color = 'black'
+font_size = 10
+
+# Reset any previous matplotlib settings
+mpl.rcParams.update(mpl.rcParamsDefault)
+# Force all plots to have exactly the same dimensions
+mpl.rcParams['savefig.bbox'] = 'standard'  # Don't use tight bbox
+mpl.rcParams['savefig.pad_inches'] = 0.1   # Consistent padding
+
+# Create and save waterfall plots with consistent borders
 for i, idx in enumerate(case_indices):
-    plt.subplot(2, 2, i+1)
+    # Get feature values for this specific case
+    x_instance = X_test_df.iloc[[idx]]
 
-    # Get SHAP values for this specific instance
-    shap_values = explainer(X_test.iloc[idx:idx+1, :])
-    case_shap = shap_values[0]
+    # Get SHAP values
+    shap_values = explainer(x_instance)
 
-    # Create waterfall plot
-    shap.plots.waterfall(case_shap, max_display=10, show=False)
+    # Create figure with fixed size
+    fig = plt.figure(figsize=fixed_figsize)
 
-    # Add title with case information
-    true_label = "Has Heart Disease" if y_test.iloc[idx] == 1 else "No Heart Disease"
+    # Create waterfall plot with smaller inner plot
+    shap.plots.waterfall(
+        shap_values[0],
+        max_display=5,
+        show=False
+    )
+
+    # Add title
+    case_type = case_labels[i]
+    true_label = "Has Heart Disease" if results_df['True_Label'].iloc[idx] == 1 else "No Heart Disease"
     pred_label = "Has Heart Disease" if results_df['Predicted'].iloc[idx] == 1 else "No Heart Disease"
     prob = results_df['Probability'].iloc[idx] * 100
 
-    plt.title(f'Case Analysis: {case_labels[i]}\n'
-             f'True Label: {true_label}, Prediction: {pred_label}, Probability: {prob:.1f}%',
-             fontsize=12)
+    plt.title(f'Case Analysis: {case_type}\n'
+              f'True Label: {true_label}, Prediction: {pred_label}, Probability: {prob:.1f}%',
+              fontsize=font_size, fontweight='bold')
 
-plt.tight_layout()
-plt.show()
+    # Add a border to the figure
+    fig.patch.set_edgecolor(border_color)
+    fig.patch.set_linewidth(border_width)
+
+    plt.subplots_adjust(left=0.25, right=0.80, top=0.80, bottom=0.20)
+
+    # Save with consistent size
+    filename = f"case_{case_type.replace(' ', '_')}.png"
+    plt.savefig(filename, dpi=100, bbox_inches=None)  # No auto-cropping
+    plt.close()
+
+# Display all saved charts
+from IPython.display import Image, display
+for case_type in case_labels:
+    display(Image(filename=f"case_{case_type.replace(' ', '_')}.png"))
+#%% md
+# # Analysis of SHAP Results for Specific Cases
+# 
+# The expanded SHAP analysis we conducted provides important insights into how the model makes decisions at the individual patient level. While the general graph showed us the importance of features globally, analyzing individual cases allows us to understand the dynamics of the model's decision-making process.
+# 
+# In the case of correct heart disease identification <u>**True Positive**</u> with a probability of 52.4%, we can see that the most significant factor pushing the prediction toward positive was **AgeCategory** with a substantial contribution of +0.87. Interestingly, **GenHealth** contributed negatively (-0.38), while **SleepTime** (-0.26) and **Sex** (-0.24) also pushed against the prediction. The collective impact of 13 other features provided a small positive contribution (+0.3), helping to ultimately push the model toward the correct prediction despite some contradicting signals.
+# 
+# In contrast, in the case of correctly identifying the absence of heart disease <u>**True Negative**</u> with a very low probability of 2.1%, the most dominant factor was **AgeCategory** with a significant negative contribution of -1.95. Additional factors that contributed to the negative prediction were **SleepTime** (-0.67), **GenHealth** (-0.6), and **MentalHealth** (-0.21). The model strongly leveraged these protective factors to correctly classify this individual as not having heart disease.
+# 
+# The analysis of incorrect cases teaches us about the model's weaknesses. In the case of a false positive prediction <u>**False Positive**</u> with a probability of 76.1%, **PhysicalActivity** was the decisive factor (+0.39), followed by **AgeCategory** (+0.37) and **PhysicalHealth** (+0.31). Despite a negative contribution from **SleepTime** (-0.23), the combined effect of these factors plus other features (+0.36) led to an incorrect positive prediction. This suggests the model may overemphasize certain physical factors in some cases.
+# 
+# The case of a false negative prediction <u>**False Negative**</u> with a probability of 15.0% reveals an interesting pattern. Here, **GenHealth** had a strong negative effect (-0.94), followed by **Asthma** (-0.51) and **SleepTime** (-0.41). Notably, **AgeCategory** actually made a positive contribution (+0.35), but it wasn't enough to overcome the other negative factors. The model failed to identify heart disease likely because the patient presented with generally good health indicators despite having heart disease.
+# 
+# From analyzing these four cases, we see that the model relies primarily on several central factors: **AgeCategory**, **GenHealth**, and **SleepTime**. Physical factors like **PhysicalActivity** and **PhysicalHealth** can strongly influence positive predictions, while health status indicators like **GenHealth** and **Asthma** can drive negative predictions. The model performs well in "classic" cases but struggles with patients who have contradicting risk factors or atypical presentations.
+# 
+# These findings suggest directions for future model improvement, such as better handling of cases with mixed signals, recalibrating the importance of sleep metrics, and potentially incorporating more nuanced interactions between age and other health indicators. The model might benefit from more sophisticated handling of patients who have heart disease despite otherwise healthy profiles.
+# 
+# SHAP analysis at the individual case level demonstrates the importance of looking beyond statistical performance metrics and provides valuable clinical insights that can help physicians assess the accuracy of model predictions in different scenarios.
 #%% md
 # # Summary and Thoughts for the future and Final Taught
 # In this study, we embarked on a data-driven journey to uncover the underlying factors contributing to heart disease risk. Beginning with a comprehensive dataset containing various lifestyle and health attributes, we carefully preprocessed the data to ensure consistency and accuracy. This involved encoding categorical variables, organizing age groups into meaningful ranges, and transforming binary responses for better analysis. We also handled missing values, normalized numerical features, and engineered new variables to enhance model performance. For instance, age groups were restructured into broader 10-year ranges to capture more meaningful patterns, and binary health indicators such as smoking, alcohol consumption, and physical activity were mapped to numerical values. With a structured dataset in place, we conducted exploratory data analysis through visualizations, revealing key trends and correlations between lifestyle choices and heart disease prevalence.
