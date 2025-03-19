@@ -615,7 +615,7 @@ cohen_d = (mean1 - mean2) / sp
 print(f"Cohen's d: {cohen_d:.4f} (Effect Size)")
 #%% md
 # The Cohen’s d value of -0.0202 indicates a very small effect size, meaning the difference in sleep duration between individuals with and without heart disease is minimal and likely not practically significant. This suggests that while there may be a statistical difference, sleep duration alone is not a strong differentiator for heart disease risk.
-# Given this extremely small effect size and the negligible correlation we observed earlier (0.01), we'll remove the SleepTime variable from our dataset to simplify our model and focus on more influential predictors of heart disease.
+# Given this tiny effect size and the negligible correlation we observed earlier (0.01), we'll remove the SleepTime variable from our dataset to simplify our model and focus on more influential predictors of heart disease.
 # 
 #%%
 df = df.drop('SleepTime', axis=1)
@@ -781,9 +781,9 @@ sns.violinplot(x="Asthma", y="PhysicalHealth", hue="HeartDisease", data=df)
 plt.title('Distribution of Physical Health Issues across Asthma and Heart Disease Status')
 plt.xlabel('Asthma Status')
 plt.ylabel('Physical Health Issues (days)')
-plt.show() #todo - change text
+plt.show()
 #%% md
-# The violin plot demonstrates the complex relationship between physical health issues, asthma, and heart disease. The plot shows that individuals with heart disease (shown in brown) consistently experience more days of poor physical health compared to those without heart disease (blue), regardless of their asthma status. Among those with heart disease, the distribution is wider and shows a higher concentration of days with physical health problems. When looking at asthma's impact, asthmatic individuals display more symmetrical and concentrated distributions of physical health issues, while non-asthmatics show more spread in their patterns. The combined presence of both conditions appears to have a compounding effect, with individuals having both heart disease and asthma showing the highest concentration of physical health issues, while those with neither condition report the fewest days of poor physical health. These patterns align with the correlation matrix findings, where heart disease showed a stronger correlation with physical health (0.17) compared to asthma's weaker correlation (0.04), indicating that heart disease has a more significant impact on physical health than asthma.
+# The violin plot demonstrates the complex relationship between physical health issues, asthma, and heart disease. The plot shows that individuals with heart disease (shown in orange) consistently experience more days of poor physical health compared to those without heart disease (blue), regardless of their asthma status. Among those with heart disease, the distribution is wider and shows a higher concentration of days with physical health problems. When looking at asthma's impact, asthmatic individuals display more symmetrical and concentrated distributions of physical health issues, while non-asthmatics show more spread in their patterns. The combined presence of both conditions appears to have a compounding effect, with individuals having both heart disease and asthma showing the highest concentration of physical health issues, while those with neither condition report the fewest days of poor physical health. These patterns align with the correlation matrix findings, where heart disease showed a stronger correlation with physical health (0.17) compared to asthma's weaker correlation (0.04), indicating that heart disease has a more significant impact on physical health than asthma.
 #%% md
 # # Relationship between Age and BMI for Asthma Patients by Heart Disease Status
 # Create a contour plot with marginal distributions to visualize how age and BMI relate specifically for asthma patients, with separate distributions for those with and without heart disease.
@@ -837,7 +837,7 @@ g.ax_joint.set_ylabel('BMI', fontsize=10)
 
 plt.show()
 #%% md
-# This contour plot with marginal distributions illustrates the relationship between age and BMI specifically for asthma patients, separated by heart disease status. The central plot shows density contours (blue for no heart disease, orange for heart disease) while the top and right margins display the distributions of age and BMI respectively. For asthma patients without heart disease (blue contours), the distribution is concentrated between ages 20-70 with BMI ranging from 20-40, showing highest density around ages 30-50 and BMI 25-35. Those with both asthma and heart disease (orange contours) tend to be older, with distributions shifted towards the 50-80 age range, while maintaining similar BMI ranges, though slightly skewing higher. The marginal distributions clearly demonstrate that among asthma patients, those with heart disease tend to be older, with a subtle trend toward higher BMI values. This aligns with the correlation matrix findings, which showed weak correlations between heart disease and both BMI (0.05) and asthma (0.04), suggesting these relationships exist but aren't strongly predictive.
+# This contour plot with marginal distributions illustrates the relationship between age and BMI specifically for asthma patients, separated by heart disease status. The central plot shows density contours (blue for no heart disease, orange for heart disease) while the top and right margins display the distributions of age and BMI respectively. For asthma patients without heart disease (blue contours), the distribution is concentrated between ages 20-70 with BMI ranging from 20-40, showing the highest density around ages 30-50 and BMI 25-35. Those with both asthma and heart disease (orange contours) tend to be older, with distributions shifted towards the 50-80 age range, while maintaining similar BMI ranges, though slightly skewing higher. The marginal distributions clearly demonstrate that among asthma patients, those with heart disease tend to be older, with a subtle trend toward higher BMI values. This aligns with the correlation matrix findings, which showed weak correlations between heart disease and both BMI (0.05) and asthma (0.04), suggesting these relationships exist but aren't strongly predictive.
 #%% md
 # # PCA (Principal Component Analysis)
 # 
@@ -953,7 +953,7 @@ plt.show()
 # 
 # ## Arrange the data to input and target and train and set
 # In this step, we're preparing our heart disease dataset by converting categorical variables to numeric format.
-# Binary variables like 'Smoking' are mapped directly (Yes=1, No=0), while multi-category variables
+# Binary variables like 'Smoking' are mapped directly (Yes=1, No=0), while multicategory variables
 # are transformed using LabelEncoder. Then, we split our features (X) and target (HeartDisease),
 # and divide the data into training (80%) and testing (20%) sets.
 #%%
@@ -1017,7 +1017,7 @@ plt.ylabel('Count')
 plt.tight_layout()
 plt.show()
 #%% md
-# The SMOTE balancing transformed your highly imbalanced dataset from a 10:1 ratio (234,055 negative vs 21,781 positive cases) to a perfectly balanced 1:1 distribution with 234,055 samples in each class. This balanced dataset should help your model better detect heart disease cases without bias toward the majority class, as SMOTE created synthetic samples rather than simply duplicating existing minority examples.
+# The SMOTE balancing transformed your highly imbalanced dataset from approximately a 10.7:1 ratio (233,802 negative vs 21,846 positive cases) to a perfectly balanced 1:1 distribution with 233,802 samples in each class. This balanced dataset should help your model better detect heart disease cases without bias toward the majority class, as SMOTE created synthetic samples rather than simply duplicating existing minority examples.
 #%% md
 # ## Scale Features
 #%%
@@ -1032,11 +1032,7 @@ print(f"y_train_balanced shape: {y_train_balanced.shape}")
 print(f"X_test_scaled shape: {X_test_scaled.shape}")
 print(f"y_test shape: {y_test.shape}")
 #%% md
-# The data preparation is now complete and ready for model training. Our balanced training dataset
-# consists of 468,110 samples with 17 features after SMOTE application. The balanced target variable
-# matches this with 468,110 labels. Our test dataset contains 63,959 samples with the same 17 features,
-# which remained unbalanced to represent real-world data distribution. This preprocessing pipeline
-# ensures our model will train on balanced data while being evaluated on realistic data conditions.
+# The data preparation is now complete and ready for model training. Our balanced training dataset consists of 467,604 samples with 15 features after SMOTE application. The balanced target variable matches this with 467,604 labels. Our test dataset contains 63,913 samples with the same 15 features, which remained unbalanced to represent real-world data distribution. This preprocessing pipeline ensures our model will train on balanced data while being evaluated on realistic data conditions.
 #%% md
 # Now we'll train and evaluate models using both datasets,
 # always testing on the original imbalanced test data to reflect real-world conditions
@@ -1117,7 +1113,7 @@ plt.ylim(0, 1)
 
 plt.show()
 #%% md
-# The classification report reveals significant class imbalance issues in our model's performance. While achieving a misleadingly high overall accuracy of 0.91, the model shows a stark contrast in its predictive capabilities: it excels at identifying non-heart disease cases (0.92 precision, 0.99 recall) but performs poorly in detecting heart disease cases (0.51 precision, 0.09 recall). This mirrors the imbalance we saw in our initial data exploration, where only 8.6% of cases had heart disease, making the model biased towards predicting the majority class.
+# The classification report reveals significant class imbalance issues in our model's performance. While achieving a misleadingly high overall accuracy of 0.91, the model shows a stark contrast in its predictive capabilities: it excels at identifying non-heart disease cases (0.92 precision, 0.99 recall) but performs poorly in detecting heart disease cases (0.52 precision, 0.09 recall). This mirrors the imbalance we saw in our initial data exploration, where only 8.6% of cases had heart disease, making the model biased towards predicting the majority class.
 #%% md
 # # Random Forest
 # Implement a Random Forest classifier to capture complex interactions between health variables and provide feature importance rankings.
@@ -1175,8 +1171,7 @@ plt.ylim(0, 1)
 
 plt.show()
 #%% md
-# The Random Forest classifier demonstrates strong performance metrics with an overall accuracy of 0.92. For heart disease detection, it achieves a precision of 0.61 and recall of 0.15. The feature importance analysis validates our earlier correlation findings, with general health status, age, and physical health emerging as the most significant predictors. This aligns with medical understanding of heart disease risk factors.
-# 
+# The Random Forest classifier demonstrates strong performance metrics with an overall accuracy of 0.90. For heart disease detection, it achieves a precision of 0.32 and recall of 0.15. The feature importance analysis validates our earlier correlation findings, with general health status, age, and physical health emerging as the most significant predictors. This aligns with medical understanding of heart disease risk factors.
 #%% md
 # # Neural Network
 #%% md
@@ -1329,8 +1324,7 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
 #%% md
-# The MLP neural network exhibited unique behavior compared to other models, with dramatic changes before and after implementing SMOTE. The original model suffered from extreme imbalance, with a low sensitivity of only 6% for heart disease cases despite an overall accuracy of 91%, indicating significant bias toward the majority class. After SMOTE, a complete reversal occurred - sensitivity soared to 76%, while precision dropped to 22%, with a significant improvement in the F1 score (from 0.11 to 0.34).
-# 
+# The MLP neural network exhibited unique behavior compared to other models, with dramatic changes before and after implementing SMOTE. The original model suffered from extreme imbalance, with a low sensitivity of only 11% for heart disease cases despite an overall accuracy of 92%, indicating significant bias toward the majority class. After SMOTE, a complete reversal occurred - sensitivity soared to 65%, while precision dropped to 20%, with a significant improvement in the F1 score (from 0.18 to 0.30).
 # Compared to other models in the study, the neural network demonstrates heightened sensitivity to data balancing techniques, a characteristic that distinguishes this algorithm family. While models like Random Forest showed only moderate improvement after SMOTE, the neural network responded much more dramatically. This phenomenon stems from the unique architecture of neural networks, allowing them to learn complex patterns and relationships between variables. With balanced data, the network better learned heart disease characteristics, though with a tendency toward overgeneralization. In the medical context of heart disease detection, the SMOTE-enhanced model may be preferred using a "better safe than sorry" approach, as it identifies more potential cases, even at the cost of false alarms. The flexibility and ability of neural networks to learn complex, non-linear patterns make them a valuable tool in health data analysis, but require careful tuning of hyperparameters and data balancing techniques.
 #%% md
 # # XGBoost
@@ -1389,11 +1383,11 @@ plt.ylim(0, 1)
 
 plt.show()
 #%% md
-# The XGBoost model demonstrated a pattern similar to other models, with significant improvement in heart disease detection after balancing the data using SMOTE. Before SMOTE, the model achieved high overall accuracy (0.91) but struggled to identify heart disease cases with very low recall of 0.08, though precision for positive cases was relatively good (0.57). After data balancing with SMOTE, there was a substantial change in performance: the recall for heart disease detection dramatically increased to 0.61 (a 7.6-fold improvement), but at the cost of reduced precision to 0.22.
+# The XGBoost model demonstrated a pattern similar to other models, with significant improvement in heart disease detection after balancing the data using SMOTE. Before SMOTE, the model achieved high overall accuracy (0.92) but struggled to identify heart disease cases with very low recall of 0.08, though precision for positive cases was relatively good (0.57). After data balancing with SMOTE, there was a substantial change in performance: the recall for heart disease detection dramatically increased to 0.73 (a 9.1-fold improvement), but at the cost of reduced precision to 0.20.
 # 
-# These results highlight XGBoost's strong ability to learn from balanced data, as it shows a better balance between precision and recall compared to Random Forest, which achieved lower recall (0.23) but higher precision (0.30). XGBoost demonstrates better recall than Random Forest but lower than the high recall of the Logistic Regression model (0.77), positioning it as a middle-ground solution in terms of heart disease detection capability.
+# These results highlight XGBoost's strong ability to learn from balanced data, as it shows a better balance between precision and recall compared to Random Forest, which achieved lower recall (0.35) but similar precision (0.20). XGBoost demonstrates similar recall to the high recall of the Logistic Regression model (0.73), positioning it as one of the better solutions in terms of heart disease detection capability among the models tested.
 # 
-# The F1-score of 0.33 (after SMOTE) indicates a significant improvement compared to 0.14 (before SMOTE), demonstrating the importance of addressing data imbalance. In summary, XGBoost offers an advanced boosting approach that provides a good balance between identifying heart disease cases and minimizing false alarms, making it a valuable addition to the range of models in the project.
+# The F1-score of 0.32 (after SMOTE) indicates a significant improvement compared to 0.15 (before SMOTE), demonstrating the importance of addressing data imbalance. While XGBoost emerges as one of the best performing models in this comparison, it's important to note that a precision of 0.20 still means 80% of its positive predictions are false alarms. In summary, XGBoost offers an advanced boosting approach that provides a good balance between identifying heart disease cases and minimizing false alarms relative to other models tested, making it a valuable addition to the range of models in the project.
 #%% md
 # # Hierarchical Clustering
 # - Perform hierarchical clustering to identify natural groupings in our health data, using Gower distance to handle mixed numeric and categorical variables.
@@ -1540,9 +1534,13 @@ for bar, percentage in zip(bars_bal, heart_disease_by_cluster_bal):
 plt.tight_layout()
 plt.show()
 #%% md
-# Hierarchical clustering analysis of heart disease data revealed distinct patient groups based on health characteristics. Before SMOTE balancing, clusters showed moderate differences in disease rates (6.5%-42.1%), with one cluster identifying higher-risk patients. After SMOTE, disease prevalence increased dramatically across all clusters (42.5%-100%), with one cluster containing only heart disease cases.
+# The hierarchical clustering analysis of heart disease data revealed distinct patient groups based on health characteristics. Before SMOTE balancing, clusters showed moderate differences in disease rates (7.1%-26.9%), with one cluster identifying higher-risk patients. After SMOTE, disease prevalence increased dramatically across all clusters (45.5%-72.3%), with significantly higher rates across all groups.
+# 
 # The bottom graphs display heart disease rates in each cluster - the left graph shows the original data with lower rates reflecting the natural imbalance in the data, while the right graph presents the disease distribution after SMOTE with significantly higher values highlighting how the balancing technique enables better identification of risk groups.
-# The dendrograms illustrate the hierarchical cluster structure and demonstrate how data balancing affects natural grouping. This unsupervised analysis complements our supervised models by identifying natural relationships between features, allowing more targeted approaches to heart disease prevention.
+# 
+# The dendrograms illustrate the hierarchical cluster structure and demonstrate how data balancing affects natural grouping. The more uniform structure after SMOTE suggests that the balanced dataset allows the algorithm to identify more nuanced relationships between features rather than being dominated by the majority class. Notably, the cluster with 72.3% heart disease rate likely represents patients sharing critical risk factors that strongly correlate with cardiac conditions.
+# 
+# This unsupervised analysis complements our supervised models by identifying natural relationships between features without relying on predefined labels. The clear stratification of risk groups could enable healthcare providers to develop targeted prevention strategies for specific patient profiles, potentially improving early intervention for those in higher-risk clusters. Furthermore, these distinct clusters may inform feature selection for future predictive models, focusing on the characteristics that most effectively distinguish between risk groups.
 #%% md
 # # Comparing the Models
 # After training multiple models from different algorithm families, we observed distinct patterns in their performance characteristics. The figure below compares the precision, recall, and F1-score for heart disease detection across all models after SMOTE balancing.
@@ -1555,16 +1553,14 @@ import seaborn as sns
 # Create DataFrame with model performance metrics after SMOTE
 metrics_data = {
     'Model': ['Logistic Regression', 'Random Forest', 'Neural Network', 'XGBoost'],
-    'Accuracy': [0.70, 0.82, None, 0.73],
-    'Precision (No HD)': [0.97, 0.93, None, 0.97],
-    'Recall (No HD)': [0.70, 0.87, None, 0.73],
-    'F1 (No HD)': [0.81, 0.90, None, 0.83],
-    'Precision (HD)': [0.19, 0.20, None, 0.20],
-    'Recall (HD)': [0.73, 0.35, None, 0.73],
-    'F1 (HD)': [0.30, 0.26, None, 0.32]
+    'Accuracy': [0.70, 0.82, 0.74, 0.73],
+    'Precision (No HD)': [0.97, 0.93, 0.96, 0.97],
+    'Recall (No HD)': [0.70, 0.87, 0.75, 0.73],
+    'F1 (No HD)': [0.81, 0.90, 0.84, 0.83],
+    'Precision (HD)': [0.19, 0.20, 0.20, 0.20],
+    'Recall (HD)': [0.73, 0.35, 0.65, 0.73],
+    'F1 (HD)': [0.30, 0.26, 0.30, 0.32]
 }
-
-
 
 metrics_df = pd.DataFrame(metrics_data)
 
@@ -1593,22 +1589,22 @@ plt.show()
 # 
 # When comparing the models' performance after SMOTE balancing, we observed distinct patterns in how these diverse algorithm families approach the heart disease prediction task.
 # 
-# **__Random Forest__** emerged as the best performer in terms of overall accuracy (**0.90**), but its precision for heart disease cases dropped to **0.23**, making it less cautious in labeling patients as having heart disease than initially thought. While it still maintains a relatively high F1-score (**0.27**), it no longer leads in balancing precision and recall.
+# **__Random Forest__** emerged as the best performer in terms of overall accuracy (**0.82**), but its precision for heart disease cases dropped to **0.20**, making it less cautious in labeling patients as having heart disease than initially thought. While it still maintains a relatively high F1-score (**0.26**), it no longer leads in balancing precision and recall, as the emphasis on accuracy seems to have led to more false positives for heart disease detection.
 # 
-# **__Logistic Regression__** demonstrated a recall of **0.70** for heart disease cases, making it effective at identifying positive cases, though with a low precision of **0.18**. This trade-off resulted in an F1-score of **0.29**, showing that it prioritizes detecting heart disease cases at the cost of more false positives.
+# **__Logistic Regression__** demonstrated a recall of **0.73** for heart disease cases, making it effective at identifying positive cases, though with a low precision of **0.19**. This trade-off resulted in an F1-score of **0.30**, showing that it prioritizes detecting heart disease cases at the cost of more false positives. Its performance is useful in contexts where detecting as many cases as possible is critical, even at the risk of misclassifying some healthy individuals.
 # 
-# **__Neural Network__** saw a significant drop in recall (**0.58**, down from 0.76 in previous results), reducing its effectiveness in identifying heart disease cases. While it maintains a relatively high precision (**0.20**) compared to **__Logistic Regression__**, its F1-score (**0.30**) suggests it is no longer as competitive in recall-driven scenarios.
+# **__Neural Network__** saw a significant drop in recall (**0.65**, down from 0.76 in previous results), reducing its effectiveness in identifying heart disease cases. While it maintains a relatively high precision (**0.20**) compared to **__Logistic Regression__**, its F1-score (**0.30**) suggests it is no longer as competitive in recall-driven scenarios. The neural network’s performance seems to have decreased, possibly due to overfitting or insufficient model tuning.
 # 
-# **__XGBoost__** provided the best balance between precision (**0.22**) and recall (**0.61**), resulting in an F1-score (**0.33**) that closely matches the top performers. This makes it a strong compromise model when balancing sensitivity and specificity is crucial.
+# **__XGBoost__** provided the best balance between precision (**0.20**) and recall (**0.73**), resulting in an F1-score (**0.32**) that closely matches the top performers. This makes it a strong compromise model when balancing sensitivity and specificity is crucial. XGBoost shows that it can adapt better than other models when a balance between avoiding false positives and maximizing recall is needed.
 # 
-# Despite applying SMOTE to address class imbalance, all models still showed significantly better performance for non-heart disease cases (**F1 scores between 0.81-0.92**) compared to heart disease cases (**F1 scores between 0.27-0.33**). While SMOTE improved recall for heart disease cases, the challenge of accurately detecting them remains.
+# Despite applying SMOTE to address class imbalance, all models still showed significantly better performance for non-heart disease cases (**F1 scores between 0.81-0.92**) compared to heart disease cases (**F1 scores between 0.26-0.32**). While SMOTE improved recall for heart disease cases, the challenge of accurately detecting them remains. This highlights the difficulty of detecting heart disease with precision in imbalanced datasets.
 # 
-# Our analysis reveals that these diverse modeling approaches capture different aspects of the heart disease prediction problem. The linear approach (**__Logistic Regression__**) remains useful for maximizing recall, while **__Neural Network__** is now less competitive. Tree-based methods (**__Random Forest__** and **__XGBoost__**) demonstrate varying trade-offs between precision and recall, with **__XGBoost__** emerging as the most balanced option.
+# Our analysis reveals that these diverse modeling approaches capture different aspects of the heart disease prediction problem. The linear approach (**__Logistic Regression__**) remains useful for maximizing recall, while **__Neural Network__** is now less competitive. Tree-based methods (**__Random Forest__** and **__XGBoost__**) demonstrate varying trade-offs between precision and recall, with **__XGBoost__** emerging as the most balanced option for real-world applications.
 # 
 # Ultimately, the choice between these models depends on clinical priorities:
-# - **If maximizing recall is most important** → **__Logistic Regression__** (0.70 recall) is preferable.
-# - **If balancing precision and recall is key** → **__XGBoost__** (F1-score 0.33) is the best choice.
-# - **If prioritizing high accuracy and minimizing false positives** → **__Random Forest__** is a safer option.
+# - **If maximizing recall is most important** → **__Logistic Regression__** (0.73 recall) is preferable, despite its lower precision.
+# - **If balancing precision and recall is key** → **__XGBoost__** (F1-score 0.32) is the best choice for a more balanced approach.
+# - **If prioritizing high accuracy and minimizing false positives** → **__Random Forest__** is a safer option, though it may result in fewer heart disease cases being detected.
 #%% md
 # # Interpretability of the Models
 # 
@@ -1645,7 +1641,7 @@ finally:
 # Create beeswarm plot
 shap.plots.beeswarm(shap_values)
 #%% md
-# The plot above sorts features by the sum of SHAP value magnitudes over all samples, and uses these values to show the distribution of impacts each feature has on the model output. Colors represent the feature value (red high, blue low). It clearly shows that older age (shown in red) significantly increases the likelihood of heart disease, while younger age (shown in blue) decreases it. General Health is the second most important feature, where poor health status (red) increases the risk of heart disease. Interestingly, features like physical activity and mental health show more moderate effects on the model's output.
+# The plot above sorts features by the sum of SHAP value magnitudes over all samples, and uses these values to show the distribution of impacts each feature has on the model output. Colors represent the feature value (red high, blue low). It clearly shows that older age (shown in red) significantly increases the likelihood of heart disease, while younger age (shown in blue) decreases it. General Health is the second most important feature, where poor health status (red) increases the risk of heart disease. Interestingly, feature like physical activity show more moderate effect on the model's output.
 #%% md
 # ## Enhancing SHAP Analysis: Case-Specific Investigation
 # So far, we performed basic SHAP analysis showing the overall feature importance in our model, as seen in the summary plot. This analysis provided general insights regarding the impact of each feature, identifying age category, general health status, sex, smoking, and stroke history as the most influential predictors for heart disease.
@@ -1764,22 +1760,24 @@ for case_type in case_labels:
 # 
 # The expanded SHAP analysis we conducted provides important insights into how the model makes decisions at the individual patient level. While the general graph showed us the importance of features globally, analyzing individual cases allows us to understand the dynamics of the model's decision-making process.
 # 
-# In the case of correct heart disease identification <u>**True Positive**</u> with a probability of 52.4%, we can see that the most significant factor pushing the prediction toward positive was **AgeCategory** with a substantial contribution of +0.87. Interestingly, **GenHealth** contributed negatively (-0.38), while **SleepTime** (-0.26) and **Sex** (-0.24) also pushed against the prediction. The collective impact of 13 other features provided a small positive contribution (+0.3), helping to ultimately push the model toward the correct prediction despite some contradicting signals.
+# In the case of correct heart disease identification <u>**True Positive**</u> with a probability of 75.7%, we can see that the most significant factor pushing the prediction toward positive was **AgeCategory** with a substantial contribution of +0.65. **GenHealth** also contributed significantly (+0.65), and **Diabetic** added another positive influence (+0.32). Despite a small negative contribution from **Sex** (-0.14), these strong positive factors successfully led to the correct prediction of heart disease, showing how the model identifies classic risk profiles.
 # 
-# In contrast, in the case of correctly identifying the absence of heart disease <u>**True Negative**</u> with a very low probability of 2.1%, the most dominant factor was **AgeCategory** with a significant negative contribution of -1.95. Additional factors that contributed to the negative prediction were **SleepTime** (-0.67), **GenHealth** (-0.6), and **MentalHealth** (-0.21). The model strongly leveraged these protective factors to correctly classify this individual as not having heart disease.
+# In contrast, in the case of correctly identifying the absence of heart disease <u>**True Negative**</u> with a very low probability of 3.7%, the model relied on several protective factors. **AgeCategory** provided a negative contribution (-1.02), supported by **GenHealth** (-0.75), **Asthma** (-0.55), and **MentalHealth** (-0.6). This consistent pattern of negative contributions demonstrates how the model effectively recognizes patients with low risk profiles.
 # 
-# The analysis of incorrect cases teaches us about the model's weaknesses. In the case of a false positive prediction <u>**False Positive**</u> with a probability of 76.1%, **PhysicalActivity** was the decisive factor (+0.39), followed by **AgeCategory** (+0.37) and **PhysicalHealth** (+0.31). Despite a negative contribution from **SleepTime** (-0.23), the combined effect of these factors plus other features (+0.36) led to an incorrect positive prediction. This suggests the model may overemphasize certain physical factors in some cases.
+# The analysis of incorrect cases teaches us about the model's weaknesses. In the case of a false positive prediction <u>**False Positive**</u> with a probability of 71.2%, **GenHealth** was the decisive factor (+0.62), followed closely by **PhysicalActivity** (+0.49) and **Diabetic** (+0.46). Interestingly, **Asthma** provided a negative contribution (-0.45), but this wasn't enough to overcome the combined positive influence of the other factors. This suggests the model may overweight certain health indicators even when they don't necessarily translate to heart disease.
 # 
-# The case of a false negative prediction <u>**False Negative**</u> with a probability of 15.0% reveals an interesting pattern. Here, **GenHealth** had a strong negative effect (-0.94), followed by **Asthma** (-0.51) and **SleepTime** (-0.41). Notably, **AgeCategory** actually made a positive contribution (+0.35), but it wasn't enough to overcome the other negative factors. The model failed to identify heart disease likely because the patient presented with generally good health indicators despite having heart disease.
+# The case of a false negative prediction <u>**False Negative**</u> with a probability of 35.9% reveals complex interactions. Here, **GenHealth** strongly pushed toward a negative prediction (-0.94), while **PhysicalActivity** also contributed negatively (-0.26). However, **AgeCategory** (+0.22) and a small contribution from other features (+0.09) pushed in the positive direction, though not enough to overcome the negative factors. Despite having heart disease, this patient likely presented with good general health indicators that misled the model.
 # 
-# From analyzing these four cases, we see that the model relies primarily on several central factors: **AgeCategory**, **GenHealth**, and **SleepTime**. Physical factors like **PhysicalActivity** and **PhysicalHealth** can strongly influence positive predictions, while health status indicators like **GenHealth** and **Asthma** can drive negative predictions. The model performs well in "classic" cases but struggles with patients who have contradicting risk factors or atypical presentations.
+# From analyzing these four cases, we see that the model consistently relies on **AgeCategory** and **GenHealth** as primary factors, with **Diabetic**, **PhysicalActivity**, and **Asthma** playing important secondary roles. The model performs well with classic risk profiles but struggles with cases showing contradictory signals, such as patients with heart disease despite good general health or patients without heart disease who have some risk factors.
 # 
-# These findings suggest directions for future model improvement, such as better handling of cases with mixed signals, recalibrating the importance of sleep metrics, and potentially incorporating more nuanced interactions between age and other health indicators. The model might benefit from more sophisticated handling of patients who have heart disease despite otherwise healthy profiles.
+# These findings suggest directions for future model improvement, particularly in handling cases with mixed signals. The model might benefit from more sophisticated weighting of risk factors when they present in unusual combinations, and from better recognition of atypical presentations of heart disease.
 # 
 # SHAP analysis at the individual case level demonstrates the importance of looking beyond statistical performance metrics and provides valuable clinical insights that can help physicians assess the accuracy of model predictions in different scenarios.
 #%% md
 # # Summary and Thoughts for the future and Final Taught
 # In this study, we embarked on a data-driven journey to uncover the underlying factors contributing to heart disease risk. Beginning with a comprehensive dataset containing various lifestyle and health attributes, we carefully preprocessed the data to ensure consistency and accuracy. This involved encoding categorical variables, organizing age groups into meaningful ranges, and transforming binary responses for better analysis. We also handled missing values, normalized numerical features, and engineered new variables to enhance model performance. For instance, age groups were restructured into broader 10-year ranges to capture more meaningful patterns, and binary health indicators such as smoking, alcohol consumption, and physical activity were mapped to numerical values. With a structured dataset in place, we conducted exploratory data analysis through visualizations, revealing key trends and correlations between lifestyle choices and heart disease prevalence.
 # 
-# Building upon these insights, we implemented machine learning models, including logistic regression and decision trees, to predict heart disease risk based on the identified factors. We applied various data transformation techniques, such as feature scaling and one-hot encoding, to optimize model performance. Additionally, we experimented with different feature selection methods to identify the most impactful predictors, analyzing how factors like kidney disease, stroke history, and sleep duration influenced heart disease risk. We evaluated models using accuracy, precision, recall, and F1-score, but despite extensive preprocessing and optimization, the prediction accuracy remained suboptimal. This suggests that heart disease risk may be influenced by additional factors not captured in the dataset, such as genetic predisposition, environmental conditions, or complex interactions between variables. Moreover, the dataset itself may not be sufficiently detailed or diverse, potentially limiting the model's ability to generalize effectively. Class imbalances, particularly in the distribution of positive heart disease cases, and potential biases in the data may have further impacted the results. While our models offer a foundational approach for risk assessment, further research with more diverse, high-quality data and advanced techniques, such as ensemble learning, or feature engineering based on medical expertise, is needed to improve predictive performance. Nonetheless, our findings contribute to the ongoing exploration of data-driven healthcare solutions and highlight the challenges of predicting complex medical conditions using machine learning.
+# Building upon these insights, we implemented machine learning models, including logistic regression and decision trees, to predict heart disease risk based on the identified factors. We applied various data transformation techniques, such as feature scaling and one-hot encoding, to optimize model performance. Additionally, we experimented with different feature selection methods to identify the most impactful predictors, analyzing how factors like kidney disease, stroke history influenced heart disease risk. We evaluated models using accuracy, precision, recall, and F1-score.
+# 
+# Despite extensive preprocessing and optimization, the prediction accuracy remained suboptimal. This suggests that heart disease risk may be influenced by additional factors not captured in the dataset, such as genetic predisposition, environmental conditions, or complex interactions between variables. Moreover, the dataset itself may not be sufficiently detailed or diverse, potentially limiting the model's ability to generalize effectively. Class imbalances, particularly in the distribution of positive heart disease cases, and potential biases in the data may have further impacted the results. While our models offer a foundational approach for risk assessment, further research with more diverse, high-quality data and advanced techniques, such as ensemble learning, or feature engineering based on medical expertise, is needed to improve predictive performance. Nonetheless, our findings contribute to the ongoing exploration of data-driven healthcare solutions and highlight the challenges of predicting complex medical conditions using machine learning.
 # 
