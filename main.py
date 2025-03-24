@@ -1,11 +1,23 @@
 #%% md
-# # Intro
-# As computer science students with a deep interest in data science, we, Hila Giladi (312557606) and Kfir Shuster (315695122), have chosen to focus on heart disease prediction and analysis. We are committed to leveraging data science to better understand risk factors and potentially help improve early detection and prevention strategies. Through careful analysis of various health metrics and lifestyle factors, we aim to contribute to the broader understanding of heart disease risk factors and their complex interactions.
+# # Introduction: A Life-Saving Question
 # 
-# # The Problem
+# Imagine a 55-year-old man named David. He leads a relatively healthy life but occasionally smokes and has a family history of heart disease. One day, he starts feeling unusual chest pains but dismisses them as stress. Could a data-driven approach have warned him earlier that he was at risk?
+# 
+# **This leads us to the central question of our project:**
+# What if we could spot the warning signs early, using only lifestyle and health data?
+# 
+# # About Us and Our Plan for This Project
+# 
+# As computer science students with a deep interest in data science, we,  Hila Giladi (312557606) and Kfir Shuster (315695122), have chosen to focus on heart disease prediction and analysis. We are committed to leveraging data science to better understand risk factors and potentially help improve early detection and prevention strategies.
+# 
+# Through careful analysis of various health metrics and lifestyle factors, we aim to contribute to the broader understanding of heart disease risk factors and their complex interactions.
+# 
+# # What’s the Risk We’re Facing?
+# To understand how cases like David’s might be predicted earlier, we first need to explore the broader problem heart disease presents.
+# 
 # Our analysis of the data reveals a complex picture of the challenges in understanding heart disease factors. While approximately 8.6% of the population in our dataset suffers from heart disease, our analysis uncovers an intricate web of relationships between various risk factors, ranging from demographic factors such as age and gender, through lifestyle habits like smoking and physical activity, to existing medical conditions such as diabetes and stroke. This complexity emphasizes the need for a comprehensive and multidimensional approach to understanding heart disease risk.
 # 
-# # The Importance of the Solution
+# # Why Solving It Matters
 # Heart disease remains one of the leading causes of mortality worldwide, making it a critical public health concern. Understanding and predicting heart disease risk isn't just about extending life expectancy - it's about improving quality of life and reducing the enormous burden on healthcare systems and families.
 # 
 # # How We're Going to Do It
@@ -18,7 +30,16 @@
 # 
 # Through this analysis, we hope to contribute to the broader understanding of heart disease risk factors and potentially develop tools that could help individuals and healthcare providers in monitoring and improving heart health outcomes. Our approach combines statistical analysis, machine learning, and data visualization to uncover patterns and relationships that might not be immediately apparent, potentially leading to more effective prevention strategies and early intervention opportunities.
 # 
-# # Data Collection and Selection Process
+# The dataset used in this project is based on the CDC’s 2020 Behavioral Risk Factor Surveillance System (BRFSS), a large-scale health survey conducted annually across the United States.
+# 
+# Source: [Heart Disease Prediction Dataset on Kaggle](https://www.kaggle.com/code/andls555/heart-disease-prediction/notebook)
+# 
+# 
+# To build our model, we analyzed 319,795 records covering a range of health, lifestyle, and demographic factors. This dataset allows us to explore the intricate relationships between lifestyle choices, medical history, and heart disease risk.
+# 
+# 
+# # Exploring the Dataset
+# 
 # We utilized a comprehensive dataset containing 319,795 records with 18 different variables, covering a wide range of metrics:
 # - Physiological measures: BMI, physical health
 # - Lifestyle habits: smoking, alcohol consumption, physical activity, sleep hours
@@ -28,27 +49,65 @@
 # This dataset was selected for its extensive scope and rich variety of variables, allowing us to examine the complex relationships between various factors and heart disease. The data provides a solid foundation for in-depth analysis and the development of predictive models that may help improve our understanding of heart disease risk factors and enhance early detection capabilities.
 # 
 # # Data Analysis
-# Let's transform our collected data into a structured pandas data frame to examine the information we've gathered. This will give us a clear view of our dataset's contents and help us understand what we're working with.
+# 
+# Now that we understand the challenge and the data we’re working with, it's time to start looking for answers.
+# 
+# We begin by exploring the dataset itself — transforming it into a structured format and getting familiar with the variables. This will help us uncover patterns, correlations, and surprising insights that may help predict heart disease risk.
+# 
+# Let’s load the data and take our first look.
+# 
 #%%
 import pandas as pd
 
 df = pd.read_csv('heart_2020_cleaned.csv')
 display(df)
 #%% md
-# # Data Processing Overview
-# Before we can analyze data and build models, preprocessing of the data is necessary. This stage is essential for ensuring the quality of analysis, as it transforms raw data into a consistent and structured format. Data processing includes converting categorical variables to numerical ones, reorganizing age categories, and handling outliers. At this stage, we will also clean and filter the data, handle missing values, and prepare the data for in-depth exploratory analysis.
+# With the data loaded and prepared, we can now begin exploring it more deeply.
+# 
+# This stage is where the story starts to unfold — we’ll look at how heart disease appears in the population, and how different lifestyle choices, health conditions, and demographics might be linked to it.
+# 
+# Our goal is to identify which variables truly help distinguish between individuals with and without heart disease — and which ones may not be as informative as they seem.
 # 
 #%% md
-# # Data Preprocessing:
-# ## Converting Categorical Variables
-# 1. Convert binary variables from Yes/No to 1/0:
-#    - Applied to health conditions and behaviors like HeartDisease, Smoking, AlcoholDrinking etc.
-#    - Special handling for KidneyDisease to ensure integer type conversion
+# Before diving into the data and modeling, it's helpful to understand how this project is structured.
+# We've organized the work into clearly defined sections, each building on the previous one — from framing the problem to interpreting the results.
 # 
-# 2. Restructure age categories into broader 10-year groups:
-#    - Original categories (e.g., "18-24", "25-29") consolidated into decade spans
-#    - New categories range from "18-29" to "80+"
-#    - Includes error handling for unknown categories
+# Here’s an overview of the main components of our analysis:
+# 
+# # Project Structure Overview
+# 
+# This project is organized into the following main sections:
+# 
+# 1. **Data Preparation** – Cleaning, encoding, restructuring, and balancing the dataset
+# 2. **Exploratory Data Analysis (EDA)** – Identifying trends, patterns, and correlations
+# 3. **Predictive Modeling** – Training and evaluating machine learning models
+# 4. **Model Comparison and Interpretation** – Comparing performance and using SHAP to explain results
+# 5. **Final Reflections and Future Directions** – Key takeaways and ideas for continued work
+# 
+# 
+#%% md
+# # 1. Data Preparation
+# 
+# Before we could explore patterns in the data, we needed to clean and structure it for analysis. This included converting binary variables, regrouping age categories, and filtering out unrealistic values to ensure our dataset is ready for meaningful analysis.
+# 
+# <details>
+# <summary>🔧 Preprocessing Details (click to expand)</summary>
+# 
+# 1. **Binary conversion (Yes/No → 1/0)**
+#    - Applied to variables such as `HeartDisease`, `Smoking`, `AlcoholDrinking`, `Stroke`, etc.
+#    - Special handling for `KidneyDisease` to ensure correct integer type.
+# 
+# 2. **Age re-grouping into 10-year categories**
+#    - Original narrow categories (e.g., `"18–24"`, `"25–29"`) were merged into broader decade ranges.
+#    - Final categories: `"18–29"`, `"30–39"`, ..., `"80+"`.
+# 
+# 3. **Sleep duration filtering**
+#    - Removed unrealistic values by keeping only entries with 1 to 16 hours of sleep per day.
+#    - This eliminated extreme outliers likely caused by data entry errors or unusual reporting.
+# 
+# </details>
+# 
+# 
 #%%
 pd.set_option('future.no_silent_downcasting', True)
 binary_columns = [
@@ -97,22 +156,59 @@ def get_age_group_10_years(age_category):
 df['AgeCategory'] = df['AgeCategory'].apply(get_age_group_10_years)
 
 display(df)
-#%% md
-# ## Data Cleaning: Filter Sleep Duration Values
-# Removed unrealistic sleep duration values by limiting the range to 1-16 hours per day, eliminating extreme outliers that likely represent data entry errors or measurement mistakes.
 #%%
 df = df[(df['SleepTime'] >= 1) & (df['SleepTime'] <= 16)]
 #%% md
-# # Summary of Data Processing
-# We have successfully completed the initial data processing phase. We converted binary variables (Yes/No) to numbers (1/0), grouped age categories into more meaningful decade groups (18-29, 30-39, etc.), and removed unrealistic sleep duration values (limiting to 1-16 hours per day). These preprocessing steps ensure that our data is now in an appropriate format for further analysis and visualization. The cleaned dataset maintains the essential information while eliminating potential sources of error from extreme outliers or inconsistent formatting.
+# # Summary of Data Preparation
+# 
+# With the noise removed and key variables organized, our data is finally ready to speak.
+# This clean foundation gives us a reliable base to begin uncovering the hidden patterns behind heart disease.
 #%% md
-# # Exploratory Data Analysis (EDA) Overview
-# Exploratory data analysis is a cornerstone of any data science project, allowing us to understand the central characteristics and patterns in our data. In this stage, we will explore the distribution of heart disease in the population and examine the relationships between heart disease and various factors such as demographic data (age, sex), lifestyle habits (smoking, alcohol consumption, physical activity), and existing health conditions (diabetes, stroke, physical and mental health). Through visualizations and statistical analyses, we will uncover insights that will guide our variable selection and model choices, and provide a deeper understanding of risk factors for heart disease.
+# # 2. Exploratory Data Analysis (EDA)
+# 
+# Now that our data is clean and well-structured, we’re ready to start uncovering patterns.
+# 
+# In this stage, we begin asking the questions that brought us here in the first place:
+# Who is most at risk of heart disease — and why?
+# 
+# We’ll explore how heart disease is distributed in the population and how it relates to factors such as age, sex, smoking, physical activity, and medical history. Through visualizations and statistical tests, we aim to find which variables truly matter, and which might be less informative than expected.
+# 
+# To guide our exploration, we focused on the following key questions:
+# - Which factors have the strongest connection to heart disease?
+# - Are commonly cited risk factors like BMI and sleep duration actually meaningful predictors?
+# - How do combinations of conditions (e.g., diabetes and stroke) affect risk levels?
+# 
+# These questions shaped the structure of our analysis and helped us focus on the variables with the most impact.
+# 
+# <details>
+# <summary>🗂️ EDA Structure Overview (click to expand)</summary>
+# 
+# To guide our analysis, we organized the EDA into the following sections:
+# 
+# 1. **Overall Distribution of Heart Disease** – Class balance of heart disease cases.
+# 2. **Heart Disease and Demographics** – Patterns across race, sex, and age.
+# 3. **Statistical Analysis of Health Variables** – Correlations, multicollinearity, and redundancy checks.
+# 4. **Heart Disease and Lifestyle Habits** – Smoking, alcohol, physical activity, general health perception.
+# 5. **Heart Disease and Pre-Existing Health Conditions** – Diabetes, stroke, kidney disease, asthma.
+# 6. **Heart Disease and Physiological Measurements** – BMI, sleep time, and related analyses.
+# 7. **Heart Disease and Interacting Health Factors** – Combined health effects and subgroups.
+# 8. **PCA (Principal Component Analysis)** – Dimensionality reduction of key health variables.
+# 
+# </details>
+# 
+# 
+# 
 #%% md
-# # EDA
-# ## Basic histogram of the prediction column
+# ## Overall Distribution of Heart Disease
+# 
+# Before diving into specific risk factors, it's important to understand the overall distribution of heart disease in our dataset.
+# How common is it? Are we dealing with a balanced population — or is one group significantly more represented than the other?
+# 
+# 
 # ### Distribution of heart disease cases in our population
-# Create a basic histogram to display the distribution of heart disease cases in our population. The purpose of this graph is to provide a clear picture of the ratio between people with and without heart disease in our dataset.
+# We begin by looking at the big picture: how is heart disease distributed across the dataset?
+# This simple histogram helps us understand the overall class balance — a key factor in choosing the right modeling strategy later on.
+# 
 #%%
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -142,10 +238,17 @@ plt.ylabel('Count')
 # Show plot
 plt.show()
 #%% md
-# The graph reveals a significant class imbalance where 91.4% (approximately 280,000 individuals) do not have heart disease, while only 8.6% (around 25,000 individuals) have heart disease.
+# The graph reveals a significant class imbalance: 91.4% of individuals in the dataset do not have heart disease, while only 8.6% do.
+# This imbalance is important to keep in mind, as it will impact both how we analyze the data and how we train predictive models later in the project.
+# 
+#%% md
+# ## Heart Disease and Demographics
+# In this section, we examine how heart disease prevalence varies across key demographic characteristics — including **race**, **sex**, and **age**.
+# Understanding these basic population-level patterns helps provide context for the deeper analyses that follow.
 #%% md
 # ### Distribution of Heart Disease by Race
-# Create a bar plot to show the distribution of heart disease cases across different racial groups, allowing us to identify any potential patterns or disparities in heart disease prevalence among different ethnic groups
+# Next, we examine the distribution of heart disease across racial groups.
+# This helps us check whether certain racial demographics show higher prevalence — or if race has limited predictive value in our dataset.
 #%%
 sns.countplot(data=df, x='Race', hue='HeartDisease', palette='YlOrBr')
 plt.xlabel('Race')
@@ -155,9 +258,11 @@ plt.xticks(rotation=45, ha='right')
 plt.show()
 #%% md
 # 
-# The graph shows that White individuals make up the largest portion of the dataset with approximately 220,000 cases, while other racial groups have significantly smaller representations. All racial groups maintain a similar proportion of heart disease cases relative to their population size.
-# This visualization, while providing demographic information, doesn't offer much predictive value for our heart disease analysis. The similar proportions of heart disease cases across all racial groups suggest that race alone is not a strong differentiating factor for heart disease risk in our dataset. This observation is further supported by the correlation matrix we examined earlier, which showed race had a weak negative correlation (-0.04) with heart disease.
-# Due to this low informational value and potential for introducing bias without adding predictive power, we'll remove this feature from our dataset now to ensure it doesn't influence our subsequent analyses and modeling.
+# The graph shows that White individuals make up the majority of the dataset, while other racial groups are represented in smaller numbers.
+# However, the proportion of heart disease within each group is relatively similar, suggesting that race may not be a strong predictor in this context.
+# 
+# To avoid introducing potential bias and to simplify our models, we chose to remove the `Race` column from our dataset.
+# This decision is based on the relatively uniform distribution observed across racial groups, and our focus on features with stronger variation in relation to heart disease.
 #%%
 # Remove Race column from dataset as it doesn't provide significant predictive value
 df = df.drop('Race', axis=1)
@@ -165,17 +270,26 @@ print(f"Race column removed. Dataset now has {df.shape[1]} columns.")
 display(df)
 #%% md
 # ### Distribution of Heart Disease by Sex
-# Create a bar plot comparing the distribution of heart disease between males and females to understand if there are any gender-based differences in heart disease prevalence.
+# We now turn to sex as a potential risk factor.
+# Are there notable differences between males and females in terms of heart disease prevalence — or is the pattern relatively balanced?
 #%%
 sns.countplot(data=df, x='Sex', hue='HeartDisease', palette='YlOrBr')
 plt.xlabel('Sex')
 plt.ylabel('Frequency')
 plt.show()
 #%% md
-# The visualization shows that females have a slightly higher total frequency (approximately 155,000 cases) compared to males (approximately 135,000 cases). Both genders display a similar pattern of heart disease distribution, with the majority not having heart disease.
+# The dataset contains slightly more female than male participants.
+# Both sexes show a similar distribution of heart disease cases, with no major disparity between them.
+# 
+# This suggests that while sex may play a role in heart disease risk, it likely interacts with other factors (like age or health conditions) rather than acting as a strong standalone predictor.
+# We'll revisit this variable later when analyzing correlations and model feature importance.
+# 
 #%% md
 # ### Distribution of Heart Disease by Age Category
-# Create a bar plot to examine how heart disease prevalence varies across different age groups, using ordered age categories to show the progression of risk with age.
+# Age is one of the most well-known risk factors for heart disease — but how clearly does that show up in our dataset?
+# 
+# Let’s look at how heart disease is distributed across different age groups to see if the risk indeed increases with age, and whether certain decades stand out more than others.
+# 
 #%%
 # create ordered list of age categories
 age_order = ['18-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80+']
@@ -189,11 +303,22 @@ plt.title('Heart Disease Distribution by Age Category')
 plt.xticks(rotation=45)  # Rotate labels for better readability
 plt.show()
 #%% md
-# The 60-69 age group has the highest frequency with approximately 60,000 cases, followed by the 50-59 age group. The incidence of heart disease (represented by lighter brown) increases notably with age, showing higher proportions in older age groups (60-69, 70-79, and 80+).
-#%% md
-# ## Correlation Matrix of Health Variables
-# Create a correlation matrix heatmap to visualize the relationships between various health-related variables, helping identify which factors are most strongly associated with heart disease.
+# As expected, the prevalence of heart disease rises with age.
+# The 60–69 age group shows the highest frequency, and the upward trend continues into the 70s and 80+ groups.
 # 
+# This confirms the strong connection between age and heart disease and supports the importance of including age as a key variable in our predictive models.
+# 
+#%% md
+# ## Statistical Analysis of Health Variables
+# Next, we shift our focus to statistical relationships between variables.
+# Using correlation analysis and multicollinearity checks, we explore how features relate to each other and to heart disease — and assess whether any of them provide redundant or overlapping information.
+# 
+#%% md
+# ### Correlation Matrix of Health Variables
+# Before diving into combinations of variables, we want to understand how each individual feature relates to heart disease.
+# 
+# To do this, we create a correlation matrix that shows the strength and direction of the relationship between heart disease and other variables in the dataset.
+# This helps us spot the features that are most likely to be useful in prediction — and those that might be less relevant.
 #%% md
 # First we convert the non-numeric columns to numeric columns for the correlation matrix.
 # 
@@ -254,11 +379,27 @@ plt.title('Correlation Matrix of Variables')
 plt.tight_layout()
 plt.show()
 #%% md
-# This correlation matrix shows the relationships between various health-related variables, with stronger correlations indicated by darker colors and numerical values ranging from -1 to 1. The most notable correlations with heart disease (HeartDisease) include: age category (0.23), stroke (0.20), difficulty walking (0.20), physical health (0.17), and diabetic status (0.18), while showing negative correlations with general health (-0.24) and physical activity (-0.10). There's a particularly strong negative correlation (-0.48) between physical health and general health, suggesting that poor physical health significantly impacts overall health perception. Interestingly, factors like BMI (0.05) and alcohol drinking (-0.03) (-0.04) show relatively weak correlations with heart disease.
+# The correlation matrix confirms several expected patterns:
+# 
+# - **Age**, **stroke**, **difficulty walking**, and **diabetes** all show positive correlations with heart disease.
+# - On the other hand, **physical activity** and **general health** are negatively correlated, meaning healthier and more active individuals are less likely to have heart disease.
+# 
+# Interestingly, some variables that are often considered risk factors — like **BMI** and **sleep time** — show surprisingly weak correlations with heart disease.
+# This suggests that they might not be strong predictors on their own, and we’ll take this into account when selecting features for modeling.
+# 
+# We also notice a moderately strong negative correlation between **physical health** and **general health**, which raises the question:
+# Do these two variables provide overlapping information, or do they each capture something unique?
+# To answer that, we turn to multicollinearity analysis using the Variance Inflation Factor (VIF).
+# 
 #%% md
-# ## Investigating Multicollinearity Using VIF Analysis
-# To ensure the reliability of our predictive models, we conducted a Variance Inflation Factor (VIF) analysis on key health variables. The VIF measures how much the variance of a regression coefficient is inflated due to multicollinearity with other predictors.
-# Our analysis focused on General Health status and Physical Health, which showed moderate correlation in our earlier correlation matrix analysis (-0.48).
+# ### Investigating Multicollinearity Using VIF Analysis
+# While the correlation matrix shows how each variable relates to heart disease, it doesn’t tell us whether two variables are providing redundant information.
+# 
+# **Multicollinearity** — when two or more features contain overlapping information — can distort model interpretation and reduce performance.
+# 
+# In particular, we noticed a moderate negative correlation between **general health** and **physical health**.
+# To check whether one of them could be dropped without losing valuable information, we calculate the Variance Inflation Factor (VIF), which helps us detect multicollinearity between variables.
+# 
 # 
 #%%
 from statsmodels.stats.outliers_influence import variance_inflation_factor
@@ -306,15 +447,19 @@ vif_data_dropped["VIF"] = [variance_inflation_factor(X_dropped.values, i) for i 
 print("\nVIF Data after dropping GenHealth_numeric:")
 print(vif_data_dropped)
 #%% md
-# The results indicate low multicollinearity between these variables, with VIF values of approximately 1.30 for both features. In statistical practice, VIF values below 5 (or even 2.5 in more conservative approaches) are generally considered acceptable. Our values are well below these thresholds, suggesting that each variable contributes unique information to our model.
-# When we removed GenHealth_numeric from the analysis, the VIF for PhysicalHealth predictably dropped to 1.0, confirming the absence of multicollinearity when only one predictor remains (apart from the constant).
-# This analysis supports our decision to retain both variables in our predictive models, as they each provide distinct information about patient health status that could be valuable for heart disease prediction, despite their moderate negative correlation.
+# The results show that both **general health** and **physical health** have low VIF values (~1.3), which indicates very low multicollinearity.
+# 
+# This means that although they are somewhat related, each provides distinct information — and both are worth keeping in the analysis.
+# Keeping both allows our models to capture both subjective and objective perspectives on a person’s health status.
+# 
 #%% md
-# ## Statistical Significance Testing: Comparing Physical Activity and Difficulty Walking
+# ### Do Physical Activity and Difficulty Walking Overlap?
 #%% md
-# Let's run T-test on the columns PhysicalActivity, DiffWalking for Equal Means:
-# Both of the columns are very similar in their meaning and has strong correlations.
-# This test can help you understand if the difference between the two columns is statistically significant. If the distributions are very similar, it might indicate that one feature can be removed without losing much predictive power.
+# Next, we want to understand whether **physical activity** and **difficulty walking** are capturing the same behavior — or providing different signals.
+# 
+# At first glance, both variables seem to relate to mobility.
+# But are they statistically distinct? To test this, we compare their distributions using a T-test.
+# 
 #%%
 from scipy.stats import ttest_ind
 
@@ -323,10 +468,28 @@ t_stat, p_value_ttest = ttest_ind(df['PhysicalActivity'], df['DiffWalking'])
 print(f"T-statistic: {t_stat:.3f}")
 print(f"P-value of T-test: {p_value_ttest:.3f}")
 #%% md
-# The T-test results show a very large T-statistic of 664.097 and a p-value of 0.000, indicating a statistically significant difference between the means of PhysicalActivity and DiffWalking. This suggests that the two variables provide distinct information and are not redundant. Therefore, it may not be appropriate to drop either column, as both could be valuable for predictive modeling, representing different aspects of the data.
+# The T-test reveals a statistically significant difference between the two variables (p < 0.001), meaning they are not interchangeable.
+# 
+# Although both relate to physical function, they likely represent **different aspects**:
+# - Physical activity captures voluntary behavior
+# - Difficulty walking reflects physical limitation
+# 
+# We’ll keep both features in our analysis, since each may provide unique predictive value.
+# 
 #%% md
 # ## Heart Disease Distribution by Lifestyle Habits
-# Create a bar plot showing the percentage of heart disease cases across different combinations of smoking and alcohol consumption habits.
+# Lifestyle choices play a major role in cardiovascular health.
+# Behaviors such as smoking, alcohol consumption, and physical activity can influence both the development and prevention of heart disease.
+# 
+# In this section, we explore how combinations of these lifestyle habits relate to heart disease prevalence in our dataset.
+# We’ll examine whether certain behaviors are more strongly associated with risk, and how subjective health perception interacts with activity levels.
+# 
+#%% md
+# ### Heart Disease by Smoking and Alcohol Habits
+# We begin our analysis of lifestyle habits by examining the combination of smoking and alcohol consumption.
+# While both behaviors are commonly linked to heart disease, their combined effect — and how it plays out in real-world data — is worth a closer look.
+# 
+# To explore this, we categorized individuals into four groups based on whether they smoke and/or drink alcohol, and compared the prevalence of heart disease in each group.
 #%%
 # read the data again to avoid changes that affect the next graph
 df_smoke_drink = pd.read_csv('heart_2020_cleaned.csv')
@@ -361,10 +524,20 @@ plt.ylabel('Percentage of People with Heart Disease (%)')
 plt.tight_layout()
 plt.show()
 #%% md
-# Smokers who don't drink have the highest prevalence of heart disease (12.8%), while non-smokers who drink show the lowest (3.0%). This aligns with the correlation matrix which showed smoking had a positive correlation with heart disease (0.11), indicating increased risk. Interestingly, alcohol drinking showed a very weak negative correlation (-0.03), explaining why categories involving drinking (non-smoker drinker at 3.0% and smoker drinker at 6.6%) show lower heart disease percentages than their non-drinking counterparts.
+# The results show a clear difference between the groups:
+# - The highest heart disease rate (12.8%) is found among individuals who smoke but do not drink.
+# - The lowest rate (3.0%) appears in those who drink but do not smoke.
+# 
+# This suggests that smoking is a stronger risk factor than moderate alcohol consumption in this dataset.
+# It also highlights that lifestyle factors don’t act in isolation — their combinations can reveal more than each variable on its own.
+# 
 #%% md
-# ## Distribution of Heart Disease by Physical Activity and Health Status
-# Create a bar plot comparing heart disease rates across different combinations of physical activity levels and general health status.
+# ### Heart Disease by Physical Activity and General Health
+# Next, we explore the relationship between physical activity and general health — two variables that are often linked to heart disease risk.
+# 
+# People who stay physically active tend to report better overall health, but does this translate into lower heart disease prevalence?
+# We created a combined feature that looks at all combinations of activity level and self-reported general health, and measured how heart disease is distributed across those groups.
+# 
 # 
 #%%
 # read the data again to avoid changes that affect the next graph
@@ -402,10 +575,20 @@ plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
 plt.show()
 #%% md
-# The data shows a progression from 2.1% (active, excellent health) to 35.5% (inactive, poor health) in heart disease risk. This pattern aligns with the correlation matrix, which showed negative correlations between heart disease and both physical activity (-0.10) and general health (-0.24), indicating that better health status and physical activity are associated with lower heart disease risk. The stronger correlation with general health is reflected in the more dramatic increases in heart disease rates as health status declines
+# The results are striking:
+# - Individuals who are physically active and report excellent health have the lowest heart disease rate (2.1%).
+# - In contrast, inactive individuals with poor health show a dramatically higher rate (35.5%).
+# 
+# This strong gradient emphasizes how both lifestyle behavior and self-perception of health interact in predicting heart disease risk.
+# It also suggests that subjective health assessments — often overlooked — may contain valuable predictive information.
+# 
 #%% md
-# ## Distribution of Heart Disease by Physical and Mental Health Days
-# Create a bar plot showing how heart disease prevalence varies with different combinations of physical and mental health issue days.
+# ### Distribution of Heart Disease by Physical and Mental Health Days
+# As part of our exploration of lifestyle and well-being, we also consider how individuals experience their day-to-day health.
+# 
+# The dataset includes two variables — **PhysicalHealth** and **MentalHealth** — which indicate the number of days in the past month a person felt physically or mentally unwell.
+# We explore whether a higher number of "unhealthy days" corresponds with greater heart disease risk.
+# 
 #%%
 # read the data again to avoid changes that affect the next graph
 df_physic_mental = pd.read_csv('heart_2020_cleaned.csv')
@@ -457,11 +640,27 @@ plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
 plt.show()
 #%% md
-# Heart disease rates increase from 4.0% (perfect physical health, minimal mental health issues) to 24.4% (over 15 days of both issues). The correlation matrix supports these patterns, showing physical health had a stronger correlation (0.17) with heart disease compared to mental health (0.03). This explains why we see larger jumps in heart disease rates when physical health days increase versus changes in mental health days
-#%% md
-# ## Heart Disease by Diabetes and Stroke Status
+# The graph shows that heart disease becomes more common as the number of physically unhealthy days increases.
+# People who reported many days of poor physical health in the past month were significantly more likely to have heart disease.
 # 
-# Create a bar plot comparing heart disease rates across different combinations of diabetes and stroke conditions.
+# In contrast, the connection between mental health and heart disease is weaker, with only a slight increase in prevalence among those with more mentally unhealthy days.
+# 
+# This suggests that frequent physical discomfort may reflect underlying issues related to heart disease,
+# while mental health — at least in this dataset — appears to have a smaller direct impact.
+# 
+#%% md
+# ## Heart Disease and Pre-Existing Health Conditions
+# Chronic health conditions are known to be major contributors to heart disease risk.
+# 
+# In this section, we examine how specific pre-existing medical issues — such as stroke, diabetes, kidney disease, and others — relate to the presence of heart disease in our dataset.
+# 
+# By looking at combinations and interactions between these conditions, we aim to uncover which ones have the most substantial impact and how they may compound each other.
+# 
+#%% md
+# ### Heart Disease by Diabetes and Stroke Status
+# We begin with two of the most well-established cardiovascular risk factors: **stroke** and **diabetes**.
+# 
+# To explore their combined effect, we created a feature that represents all four possible combinations of stroke and diabetes status, then calculated the prevalence of heart disease in each group.
 #%%
 # read the data again to avoid changes that affect the next graph
 df_diabetic_stroke = pd.read_csv('heart_2020_cleaned.csv')
@@ -496,11 +695,26 @@ plt.ylabel('Percentage of People with Heart Disease (%)')
 plt.tight_layout()
 plt.show()
 #%% md
-# The progression from 5.8% (neither condition) to 48.1% (both conditions) aligns with the correlation matrix, where both diabetes (0.18) and stroke (0.20) showed positive correlations with heart disease. The slightly higher correlation for stroke is reflected in its stronger individual impact (31.1% vs 19.3% for diabetes alone).
-#%% md
-# ## BMI Distribution by Heart Disease Status
+# The results are clear and concerning:
+# - Individuals with both stroke and diabetes have a heart disease prevalence of 48.1% — nearly half of that group.
+# - In contrast, those with neither condition show a rate of just 5.8%.
 # 
-# Create a density plot comparing BMI distributions between people with and without heart disease.
+# This suggests a **strong compounding effect** between these two chronic conditions, underlining the importance of early monitoring and intervention for people living with both.
+# 
+#%% md
+# ## Heart Disease and Physiological Measurements
+# Physiological metrics such as body mass index (BMI), sleep duration, and kidney function provide measurable indicators of a person's physical state.
+# These factors are commonly considered in medical assessments, but how well do they actually correlate with heart disease?
+# 
+# In this section, we examine the relationship between these physiological measurements and heart disease status — using visualizations, statistical tests, and pairwise comparisons to explore their potential predictive power.
+# 
+#%% md
+# ### BMI Distribution by Heart Disease Status
+# 
+# We start by looking at **BMI**, a common health indicator often associated with cardiovascular risk.
+# 
+# We compare the distribution of BMI values between individuals with and without heart disease to identify potential differences.
+# 
 #%%
 # create the density plot
 plt.figure(figsize=(10, 6))
@@ -513,9 +727,17 @@ plt.ylabel('Density')
 plt.tight_layout()
 plt.show()
 #%% md
-# The KDE plot of BMI distribution by heart disease status shows a similar right-skewed pattern for both groups, with individuals having heart disease slightly skewed towards a higher BMI. While this suggests a potential link between BMI and heart disease, the significant overlap between distributions indicates that BMI alone may not be a strong predictor. Further statistical analysis, such as an ANOVA test, can help determine if the difference in BMI between those with and without heart disease is statistically significant.
+# The distributions show that BMI tends to be slightly higher on average among individuals with heart disease.
+# However, the difference is not dramatic, and the overall spread of values is fairly similar.
+# 
+# This suggests that while BMI may have some predictive value, it may not be a strong standalone indicator in this dataset.
+# 
 #%% md
-# ## ANOVA Testing: Comparing BMI Distribution Between Heart Disease Groups
+# #### ANOVA Test: BMI Differences by Heart Disease Status
+# To determine whether the difference in BMI between the two groups is statistically significant, we conducted a one-way ANOVA test.
+# 
+# This allows us to test if the mean BMI differs meaningfully between individuals with and without heart disease.
+# 
 # 
 #%%
 from scipy.stats import f_oneway
@@ -535,11 +757,16 @@ stat, p_value = f_oneway(bmi_no_heart_disease, bmi_with_heart_disease)
 # Print results
 print(f"ANOVA Statistic: {stat:.4f}, p-value: {p_value:.4f}")
 #%% md
-# The ANOVA test indicates a statistically significant difference in BMI between individuals with and without heart disease (F = 860.4963, p < 0.0001). This suggests that BMI is a relevant factor in heart disease prediction
-#%% md
-# ## Kidney Disease Distribution by Heart Disease Status
+# The ANOVA test reveals a highly statistically significant difference in BMI between individuals with and without heart disease (F = 860.5, p < 0.001).
+# This confirms that the average BMI of people with heart disease is different from those without, and that this difference is unlikely to be due to chance.
 # 
-# Create a density plot showing the distribution of kidney disease among individuals with and without heart disease.
+#%% md
+# ### Kidney Disease Distribution by Heart Disease Status
+# 
+# Next, we explore **kidney disease**, another chronic condition often linked to cardiovascular health.
+# 
+# We compare the proportion of individuals with and without kidney disease across the heart disease groups to see if there’s a notable association.
+# 
 #%%
 sns.kdeplot(data=df, x='KidneyDisease', hue='HeartDisease', fill=True, common_norm=False)
 
@@ -550,11 +777,14 @@ plt.ylabel('Density')
 plt.tight_layout()
 plt.show()
 #%% md
-# The correlation matrix showed a positive correlation (0.15) between kidney disease and heart disease, which is reflected in the relatively higher density at 1 for the heart disease group, though the overall prevalence remains low in both groups.
+# The data shows that individuals with kidney disease are more likely to have heart disease compared to those without kidney issues.
+# This supports existing medical knowledge that kidney function and heart health are closely connected, and that impaired kidney function can be a significant risk factor for cardiovascular disease.
 #%% md
-# ## Sleep Time Distribution by Heart Disease Status
+# ### Sleep Time Distribution by Heart Disease Status
 # 
-# Create a density plot comparing sleep patterns between those with and without heart disease.
+# Sleep is often considered a crucial component of overall health — but how strongly is it associated with heart disease?
+# 
+# In this section, we examine the distribution of sleep duration (in hours) among individuals with and without heart disease to see if sleep time differs between the two groups.
 # 
 #%%
 sns.kdeplot(data=df, x='SleepTime', hue='HeartDisease', fill=True, common_norm=False)
@@ -570,11 +800,18 @@ plt.legend(title='Heart Disease')
 plt.tight_layout()
 plt.show()
 #%% md
-# This density plot shows the distribution of sleep hours comparing individuals with and without heart disease, with a red dashed line indicating the recommended 8 hours of sleep. The distribution is multimodal (showing multiple peaks) with the highest concentration around 7-8 hours of sleep for both groups. People without heart disease (shown in blue) have slightly higher peaks at the recommended sleep duration, while those with heart disease (shown in grey) show a more spread out distribution with lower peaks. However, the overall similar patterns between both groups align with the very weak correlation (0.01) found in the correlation matrix between sleep time and heart disease. The plot suggests that sleep duration alone may not be a strong predictor of heart disease risk, though there's a slight tendency for people without heart disease to maintain more regular sleep patterns closer to the recommended 8 hours.
-#%% md
-# ## BMI vs Sleep Time by Heart Disease Status
+# The distributions of sleep time between the two groups appear very similar.
+# There is no obvious difference in the number of sleep hours reported by individuals with and without heart disease.
 # 
-# Create two separate density plots comparing the BMI-sleep relationship for people with and without heart disease.
+# This suggests that **sleep duration alone** may not be a strong indicator of heart disease risk — at least within the range of values retained in our cleaned dataset.
+# 
+#%% md
+# ### BMI vs Sleep Time by Heart Disease Status
+# 
+# To further explore the potential relationship between BMI and sleep time, we plotted the two variables together, segmented by heart disease status.
+# 
+# This allows us to observe whether certain combinations of BMI and sleep duration are more common among individuals with or without heart disease.
+# 
 # 
 #%%
 # separate plots by Heart Disease status for BMI vs Sleep Time
@@ -591,10 +828,16 @@ for i, condition in enumerate(df['HeartDisease'].unique()):
 plt.tight_layout()
 plt.show()
 #%% md
-# These two density plots compare the relationship between BMI and sleep time for people with heart disease (left) and without heart disease (right). In both groups, there are similar patterns of horizontal bands showing common sleep durations between 5-10 hours. However, there are some notable differences: people with heart disease (left plot) show a slightly higher concentration in the higher BMI ranges (30-40), indicated by the brighter red areas, while those without heart disease (right plot) have their highest concentrations in the lower BMI ranges (20-30). Both plots show multiple bands of sleep duration, suggesting that sleep patterns are similar regardless of BMI or heart disease status, which aligns with the weak correlations we saw earlier in the correlation matrix (BMI with heart disease: 0.05, sleep time with heart disease: 0.01).
+# The plot reveals no clear separation between the two groups.
+# Individuals with and without heart disease are spread similarly across the BMI–sleep space.
+# 
+# This supports earlier findings that neither BMI nor sleep time — on their own or combined — show strong differentiating patterns in this dataset.
 #%% md
-# ## Cohen's d Effect Size Analysis: Sleep Time and Heart Disease
-# Let's assess whether sleep duration is essential for prediction using Cohen’s d. This metric quantifies the effect size by measuring the difference between two group means in terms of standard deviation, offering insight into the practical significance of the variation.
+# #### Cohen’s d: Sleep Time Differences by Heart Disease Status
+# While the visual distributions of sleep time appeared similar, statistical significance does not always mean practical significance.
+# 
+# To evaluate the actual magnitude of the difference, we used **Cohen’s d**, a standard measure of effect size, comparing sleep duration between the two heart disease groups.
+# 
 # 
 #%%
 df["SleepTime"].dropna(inplace=True)
@@ -614,16 +857,21 @@ sp = np.sqrt(((n1 - 1) * std1 ** 2 + (n2 - 1) * std2 ** 2) / (n1 + n2 - 2))
 cohen_d = (mean1 - mean2) / sp
 print(f"Cohen's d: {cohen_d:.4f} (Effect Size)")
 #%% md
-# The Cohen’s d value of -0.0202 indicates a very small effect size, meaning the difference in sleep duration between individuals with and without heart disease is minimal and likely not practically significant. This suggests that while there may be a statistical difference, sleep duration alone is not a strong differentiator for heart disease risk.
-# Given this tiny effect size and the negligible correlation we observed earlier (0.01), we'll remove the SleepTime variable from our dataset to simplify our model and focus on more influential predictors of heart disease.
+# Cohen’s d value indicates a very small effect size, meaning that the difference in sleep time between the two groups is statistically negligible.
+# 
+# Given this minimal impact, we chose to remove the `SleepTime` column from the dataset.
+# This allows us to focus on features with stronger predictive potential and avoid noise from weak signals.
 # 
 #%%
 df = df.drop('SleepTime', axis=1)
 print(f"SleepTime column removed. Dataset now has {df.shape[1]} columns.")
 #%% md
-# ## BMI vs Physical Health by Heart Disease Status
+# ### BMI vs Physical Health by Heart Disease Status
 # 
-# Create density plots comparing the relationship between BMI and physical health days for those with and without heart disease.
+# Next, we explore the relationship between **BMI** and **physical health**, and how that relationship differs between individuals with and without heart disease.
+# 
+# This can help us understand whether the interaction between excess weight and physical condition plays a role in heart disease risk.
+# 
 # 
 #%%
 # create separate plots for each Heart Disease category
@@ -640,11 +888,18 @@ for i, health in enumerate(df['HeartDisease'].unique()):
 plt.tight_layout()
 plt.show()
 #%% md
-# These density plots compare BMI and Physical Health days between individuals with and without heart disease. The left plot (Heart Disease: 0) shows a concentrated cluster at lower BMI (20-30) and fewer physical health issue days, indicating healthier patterns. The right plot (Heart Disease: 1) reveals two distinct concentrations: one with low physical health days and normal BMI, and another showing higher physical health days, suggesting more health challenges in people with heart disease. These patterns align with the correlation matrix, which showed physical health had a moderate correlation with heart disease (0.17), while BMI showed a weaker correlation (0.05), highlighting that physical health issues may be a better indicator of heart disease risk than BMI alone.
+# These density plots compare BMI and physical health days between individuals with and without heart disease.
+# 
+# Among those without heart disease, there's a clear concentration at lower BMI (20–30) and fewer physically unhealthy days — indicating generally healthier profiles.
+# In contrast, the heart disease group shows two distinct patterns: one similar to the healthy group, and another with significantly more unhealthy days, suggesting increased physical burden.
+# 
+# This observation aligns with the correlation matrix: **physical health** had a moderate correlation with heart disease (0.17), while **BMI** showed a weaker one (0.05), reinforcing the idea that functional health status may be a more reliable indicator than body weight alone.
+# 
 #%% md
-# ## Physical Health vs Mental Health by Heart Disease Status
+# ### Physical Health vs Mental Health by Heart Disease Status
+# To explore the balance between physical and mental well-being, we plotted these two variables against each other, segmented by heart disease status.
 # 
-# 
+# We’re looking for patterns in how day-to-day health experiences relate to heart disease prevalence.
 #%%
 # Physical and Mental Health Impact
 plt.figure(figsize=(15, 6))
@@ -666,11 +921,22 @@ plt.title(f'Physical Health vs Mental Health\nHeart Disease: 0')
 plt.tight_layout()
 plt.show()
 #%% md
-# The right plot (without heart disease) shows a strong concentration near zero for both health metrics, indicating most healthy individuals experience few poor health days. The left plot (with heart disease) shows more dispersion with multiple hotspots, including significant densities at higher numbers of both physical and mental health days. This pattern aligns with the correlation matrix where physical health showed stronger correlation with heart disease (0.17) than mental health (0.03), though the visualization suggests these factors often occur together in heart disease patients.
-# To further assess potential multicollinearity and ensure both features contribute independently to the model, we will use the Variance Inflation Factor (VIF), which confirms that these variables do not exhibit significant collinearity.
+# The density plots show a clear difference between the two heart disease groups.
+# 
+# Among individuals without heart disease, most report very few physically or mentally unhealthy days — clustering near the origin.
+# In contrast, those with heart disease exhibit more variation, with multiple concentrations at higher numbers of both physical and mental health days.
+# This suggests that poor physical and mental health often **co-occur** in individuals with heart disease.
+# 
+# This pattern aligns with the correlation matrix, where **physical health** had a stronger correlation (0.17) than **mental health** (0.03).
+# To further assess whether both variables contribute independently to the model — or if they overlap too much — we follow this with a **Variance Inflation Factor (VIF)** analysis to test for multicollinearity.
+# 
 #%% md
-# ## Multicollinearity Analysis: Variance Inflation Factor (VIF)
-# The following code calculates the Variance Inflation Factor (VIF) for our numerical health metrics to assess potential multicollinearity between these variables. VIF helps identify how much the variance of an estimated regression coefficient increases if predictors are correlated, with higher values indicating stronger multicollinearity issues.
+# #### Multicollinearity Analysis (VIF)
+# 
+# Before continuing, we assess whether some of the variables we’ve used so far might be redundant or highly correlated.
+# 
+# To do this, we calculate the **Variance Inflation Factor (VIF)** for each feature, focusing especially on variables like mental health and physical health, which appeared to overlap.
+# 
 #%%
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
@@ -694,10 +960,23 @@ vif_data["VIF"] = [variance_inflation_factor(df_vif.values, i) for i in range(le
 # Display the results
 print(vif_data)
 #%% md
-# The VIF analysis for PhysicalHealth and MentalHealth resulted in low values (1.20 for both), indicating no significant multicollinearity between them. This suggests that both features contribute independently to the model and are not redundant. Since they provide unique information, there is no need to remove either feature, and both can be retained for further analysis and model training.
+# The results show that both **PhysicalHealth** and **MentalHealth** have low VIF values—indicating little to no multicollinearity.
+# 
+# Thus, despite appearing related, each feature provides distinct information and can be retained in the modeling phase.
 #%% md
-# # 3D Relationship between Physical Health, Mental Health, BMI, and Heart Disease
-# Create a 3D scatter plot to visualize the complex relationship between physical health, mental health, BMI, and heart disease status, using different colors to distinguish between cases.
+# ## Heart Disease and Interacting Health Factors
+# Some health variables become more meaningful when examined together.
+# In this section, we explore how combinations of physical health, mental health, BMI, general health, and asthma interact — and how those interactions differ between individuals with and without heart disease.
+# 
+# Rather than analyzing variables in isolation, we focus on joint distributions and subgroup analyzes to uncover more subtle patterns.
+# 
+#%% md
+# ### 3D View: Physical & Mental Health vs. BMI by Heart Disease
+# We begin this section with a 3D visualization combining three key variables:
+# **physical health days**, **mental health days**, and **BMI**.
+# 
+# By comparing the spatial distributions of individuals with and without heart disease, we aim to see whether certain combinations of these features form identifiable risk zones.
+# 
 # 
 #%%
 import pandas as pd
@@ -758,22 +1037,39 @@ for angle in [(30, 45), (30, 120), (20, 210), (45, 300)]:
 
 plt.show()
 #%% md
-# The 3D plot reveals that heart disease cases (red points) are more prevalent among individuals with higher physical health issues, while showing a weaker association with mental health metrics. Points form vertical clustering patterns due to discrete day-count values in the original data. The visualization confirms the stronger correlation between physical health and heart disease (0.17) compared to mental health (0.03). While heart disease cases appear across various BMI values, they show some concentration in higher ranges, demonstrating the complex, non-linear interactions between these health factors.
+# The 3D plot reveals that heart disease cases are more concentrated among individuals reporting a higher number of physically unhealthy days,
+# while the association with mental health days appears weaker.
+# 
+# Points also show vertical clustering due to the discrete nature of the day-count variables.
+# Heart disease cases span a wide range of BMI values, but there is some concentration in higher BMI areas.
+# 
+# Overall, the visualization supports earlier findings: **physical health** has a stronger correlation with heart disease (0.17) than **mental health** (0.03), highlighting the more dominant role of physical health burden.
+# 
 #%% md
-# # BMI Distribution by General Health and Heart Disease Status
-# Create a boxplot showing BMI distributions across different general health categories, split by heart disease status.
+# ### BMI Distribution by General Health and Heart Disease Status
+# Next, we examine how **BMI** varies across different levels of **self-reported general health**, and how this pattern changes between individuals with and without heart disease.
 # 
-# 
+# This helps us understand whether body weight interacts meaningfully with how people perceive their overall health.
 #%%
 plt.figure(figsize=(15, 8))
 sns.boxplot(x="GenHealth", y="BMI", hue="HeartDisease", data=df)
 plt.title('BMI Distribution by General Health and Heart Disease Status')
 plt.show()
 #%% md
-# Across all general health categories (Excellent, Very good, Good, Fair, Poor), there's a consistent pattern where individuals with better general health ratings tend to have lower BMI values. The medians and distributions of BMI gradually increase as general health ratings decline, with Fair and Poor health categories showing the highest median BMIs and widest ranges. When comparing those with and without heart disease, people with heart disease consistently show slightly higher BMI medians within each health category, though this difference is most pronounced in the Fair and Poor health categories. All health categories display outliers at high BMI values, with particularly extreme outliers (reaching BMI values of 80+) appearing in the Fair and Poor health categories. However, the relatively similar distributions between heart disease and non-heart disease groups across health categories aligns with the weak correlation (0.05) between BMI and heart disease found in the correlation matrix, suggesting that while BMI has some relationship with both general health and heart disease, it's not a strongly determining factor on its own.
+# Across all general health categories — from Excellent to Poor — individuals with better self-reported health tend to have lower BMI values.
+# 
+# BMI medians and distributions increase gradually as general health declines, with the highest values appearing in the Fair and Poor categories.
+# Within each category, individuals with heart disease generally show slightly higher BMI than those without, though the difference is **most noticeable** in the lower health categories.
+# 
+# Despite these trends, the distributions between groups are still fairly similar overall, and this aligns with the **weak correlation (0.05)** between BMI and heart disease in the correlation matrix — suggesting that BMI alone is not a strong differentiator.
+# 
 #%% md
-# # Physical Health Distribution by Asthma and Heart Disease Status
-# Create a violin plot showing physical health distributions across asthma status, split by heart disease presence.
+# ### Physical Health Distribution by Asthma and Heart Disease Status
+# Asthma is a chronic condition that can limit physical activity and general well-being.
+# Here, we look at how the number of physically unhealthy days varies based on asthma status and heart disease presence.
+# 
+# This allows us to see whether asthma exacerbates physical health difficulties in heart disease patients.
+# 
 #%%
 sns.set_theme(style="ticks", palette="pastel")
 plt.figure(figsize=(15, 8))
@@ -783,11 +1079,21 @@ plt.xlabel('Asthma Status')
 plt.ylabel('Physical Health Issues (days)')
 plt.show()
 #%% md
-# The violin plot demonstrates the complex relationship between physical health issues, asthma, and heart disease. The plot shows that individuals with heart disease (shown in orange) consistently experience more days of poor physical health compared to those without heart disease (blue), regardless of their asthma status. Among those with heart disease, the distribution is wider and shows a higher concentration of days with physical health problems. When looking at asthma's impact, asthmatic individuals display more symmetrical and concentrated distributions of physical health issues, while non-asthmatics show more spread in their patterns. The combined presence of both conditions appears to have a compounding effect, with individuals having both heart disease and asthma showing the highest concentration of physical health issues, while those with neither condition report the fewest days of poor physical health. These patterns align with the correlation matrix findings, where heart disease showed a stronger correlation with physical health (0.17) compared to asthma's weaker correlation (0.04), indicating that heart disease has a more significant impact on physical health than asthma.
-#%% md
-# # Relationship between Age and BMI for Asthma Patients by Heart Disease Status
-# Create a contour plot with marginal distributions to visualize how age and BMI relate specifically for asthma patients, with separate distributions for those with and without heart disease.
+# The violin plot illustrates the complex interaction between physical health issues, asthma, and heart disease.
 # 
+# Individuals with heart disease consistently report more physically unhealthy days, regardless of asthma status — with wider and higher distributions among heart disease cases.
+# Asthma alone also appears to affect the distribution: asthmatic individuals show more symmetrical and concentrated patterns, while non-asthmatics have a more varied spread.
+# 
+# The combination of both conditions shows a **compounding effect**: people with both heart disease and asthma report the **highest concentration of physical health issues**, while those with neither condition report the fewest.
+# 
+# This pattern aligns with the correlation matrix: heart disease has a stronger correlation with physical health (0.17), while asthma’s correlation is weaker (0.04), reinforcing that heart disease plays a more dominant role in limiting physical well-being.
+# 
+#%% md
+# ### Age vs. BMI in Asthma Patients by Heart Disease Status
+# Finally, we focus on a specific subgroup: individuals with asthma.
+# We examine how **age** and **BMI** interact within this group, segmented by heart disease status.
+# 
+# This allows us to assess whether weight gain across age behaves differently in asthma patients with or without heart disease.
 #%%
 import pandas as pd
 import seaborn as sns
@@ -837,15 +1143,29 @@ g.ax_joint.set_ylabel('BMI', fontsize=10)
 
 plt.show()
 #%% md
-# This contour plot with marginal distributions illustrates the relationship between age and BMI specifically for asthma patients, separated by heart disease status. The central plot shows density contours (blue for no heart disease, orange for heart disease) while the top and right margins display the distributions of age and BMI respectively. For asthma patients without heart disease (blue contours), the distribution is concentrated between ages 20-70 with BMI ranging from 20-40, showing the highest density around ages 30-50 and BMI 25-35. Those with both asthma and heart disease (orange contours) tend to be older, with distributions shifted towards the 50-80 age range, while maintaining similar BMI ranges, though slightly skewing higher. The marginal distributions clearly demonstrate that among asthma patients, those with heart disease tend to be older, with a subtle trend toward higher BMI values. This aligns with the correlation matrix findings, which showed weak correlations between heart disease and both BMI (0.05) and asthma (0.04), suggesting these relationships exist but aren't strongly predictive.
-#%% md
-# # PCA (Principal Component Analysis)
+# This scatter plot explores how BMI varies with age among asthma patients, segmented by heart disease status.
 # 
+# A general upward trend in BMI with increasing age is observed for both groups.
+# However, individuals with heart disease tend to have **slightly higher BMI** across most age ranges.
+# This may suggest that asthma patients who also develop heart disease are more likely to be overweight or obese, possibly due to compounded health challenges or reduced physical activity.
+# 
+# That said, there is considerable overlap between the two groups, indicating that **BMI alone is not sufficient** to explain heart disease in asthma patients.
 # 
 #%% md
-# PCA is applied to reduce the dimensionality of the health metrics (BMI, PhysicalHealth, MentalHealth, GenHealth) while retaining the most significant variance. This helps identify underlying patterns in the data and determine whether these metrics effectively differentiate individuals based on sex and age. By transforming the data into principal components, we can evaluate the importance of each feature and assess whether sex and age plays a meaningful role in the overall variance of health-related factors.
+# ## PCA (Principal Component Analysis)
 #%% md
-# ## Focused PCA with Health Metrics Colored by Sex Category
+# PCA is applied to reduce the dimensionality of health-related variables — specifically **BMI**, **PhysicalHealth**, **MentalHealth**, and **GenHealth** — while preserving the most significant variance in the data.
+# 
+# This technique helps uncover underlying structure and patterns, and allows us to assess whether variables such as **sex** and **age** correspond with distinct clusters in the transformed space.
+# By projecting the data onto principal components, we evaluate how well these demographic categories align with health-related variation.
+# 
+#%% md
+# ### PCA Projection of Health Metrics Colored by Sex
+# 
+# To explore whether sex plays a meaningful role in shaping health profiles, we apply PCA to four key health metrics:
+# **BMI**, **PhysicalHealth**, **MentalHealth**, and **GenHealth**.
+# 
+# The resulting 2D projection helps visualize how individuals cluster in the principal component space, with colors representing male and female categories.
 #%%
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -902,8 +1222,11 @@ plt.show()
 #%% md
 # The PCA scatter plot shows a high degree of overlap between males and females, indicating that sex does not significantly separate within the reduced feature space. This suggests that the selected health metrics do not vary meaningfully based on sex, making it a weak differentiating factor in this context.
 #%% md
-# ## Focused PCA with Health Metrics Colored by Age Category
-# Finally, we'll examine the same health metrics (BMI, PhysicalHealth, MentalHealth, GenHealth) but now coloring by age category to understand how these health relationships vary across different age groups.
+# ### PCA Projection of Health Metrics Colored by Age Category
+# We now repeat the PCA projection using the same four health metrics — **BMI**, **PhysicalHealth**, **MentalHealth**, and **GenHealth** —
+# but this time color the points by **age category** instead of sex.
+# 
+# This helps us examine whether health-related variation in the dataset aligns with age groups, and whether PCA captures age-related patterns.
 #%%
 # create a DataFrame with principal components
 principalDf2 = pd.DataFrame(data=principal_components, columns=['PC 1', 'PC 2'])
@@ -935,27 +1258,70 @@ plt.show()
 # The age groups are distributed across the first two principal components (PC1 and PC2). The color coding by AgeCategory suggests that the variance in the dataset does not distinctly separate age groups, indicating that age may not strongly influence the primary variance captured by PCA. Additionally, the dispersed nature of points with no clear clustering suggests that the selected health metrics do not differentiate strongly across age categories in the reduced dimensionality space.
 #%% md
 # # Summary of Exploratory Data Analysis
-# Our exploratory analysis revealed significant insights regarding heart disease and its risk factors. We identified a clear imbalance in the data, with only 8.6% of samples classified as having heart disease, which requires special consideration in the model-building stage. We found important correlations with heart disease: age (0.23), stroke (0.20), difficulty walking (0.20), diabetic status (0.18), and physical health (0.17) showed the strongest positive correlations, while general health status (-0.24) showed a strong negative correlation.
 # 
-# Our visualizations highlighted interesting patterns: smokers who don't drink exhibit the highest rate of heart disease (12.8%); inactive people with poor general health show a heart disease rate of 35.5% compared to just 2.1% in active people with excellent health; and the combination of diabetes and stroke leads to a heart disease rate of 48.1%.
+# Our exploratory analysis uncovered key insights into heart disease risk and its associated factors.
 # 
-# During the EDA process, we made important feature selection decisions based on our findings. We removed the Race variable as it showed minimal predictive value (correlation of -0.04) and could potentially introduce bias. Similarly, SleepTime was removed after Cohen's d analysis revealed a very small effect size (-0.0202), indicating that sleep duration alone is not a strong differentiator for heart disease risk.
+# We began by observing a clear class imbalance: only 8.6% of individuals in the dataset were classified as having heart disease.
+# This imbalance has important implications for modeling and evaluation strategies later on.
 # 
-# PCA analysis and other statistical tests confirmed that our remaining variables contribute unique information to the model without significant multicollinearity, providing a solid foundation for our modeling phase.
+# Several variables emerged as strongly associated with heart disease:
+# - **Age** (0.23), **stroke** (0.20), **difficulty walking** (0.20), **diabetes** (0.18), and **physical health** (0.17) showed the highest positive correlations.
+# - **General health** demonstrated a strong negative correlation (-0.24), highlighting its importance as a protective factor.
+# 
+# Our visual analyses revealed meaningful patterns:
+# - **Smokers who don’t drink** had the highest heart disease prevalence (12.8%),
+# - **Inactive individuals with poor general health** showed a heart disease rate of 35.5%, compared to just 2.1% in active individuals reporting excellent health.
+# - The combination of **diabetes and stroke** resulted in the highest observed rate — 48.1%.
+# 
+# Based on these findings, we made targeted feature selection decisions:
+# - We removed the **Race** variable due to its minimal correlation with heart disease (-0.04) and potential to introduce bias.
+# - We also removed **SleepTime**, following visual inspection and a **Cohen's d** analysis which revealed a negligible effect size (-0.0202), suggesting it does not meaningfully distinguish between heart disease groups.
+# 
+# Finally, statistical tests such as correlation matrices, VIF analysis, and PCA confirmed that the selected variables contribute **independent and non-redundant** information.
+# The PCA projections also showed that **sex** and **age** do not meaningfully separate individuals based on health metrics alone, reinforcing our focus on behavioral and medical features over demographics.
+# 
+# Altogether, the EDA provided a clear foundation for modeling — both in identifying impactful variables and in filtering out weaker ones.
+# 
 #%% md
-# # Model Building and Training Overview
-# After gaining a deep understanding of our data, we are ready to build models that will attempt to predict the risk of heart disease. In this stage, we will first address the challenge of data imbalance using the SMOTE technique, which will create synthetic samples of heart disease cases to balance the training set. We will then develop a variety of models - from relatively simple models like logistic regression, through decision tree-based models like Random Forest, to complex neural networks. Additionally, we will explore natural patterns in the data using a hierarchical clustering algorithm. Comparing different models will allow us to understand the advantages and disadvantages of each approach and choose the most appropriate model for our needs.
-#%% md
-# # Data Balancing using SMOTE
-# As we observed in our EDA, there is a significant class imbalance in our dataset (91.4% without heart disease vs 8.6% with heart disease). This imbalance can affect model performance, particularly the ability to detect the minority class (heart disease). We'll use SMOTE (Synthetic Minority Over-sampling Technique) to balance our dataset.
+# # 3. Predictive Modeling
 # 
-#%% md
+# With a clear understanding of the data and the most impactful variables identified during our exploratory analysis,
+# we now move on to the next stage of the project: building models to predict heart disease risk.
 # 
-# ## Arrange the data to input and target and train and set
-# In this step, we're preparing our heart disease dataset by converting categorical variables to numeric format.
-# Binary variables like 'Smoking' are mapped directly (Yes=1, No=0), while multicategory variables
-# are transformed using LabelEncoder. Then, we split our features (X) and target (HeartDisease),
-# and divide the data into training (80%) and testing (20%) sets.
+# We implemented a variety of machine learning algorithms from different modeling families —
+# each based on fundamentally different mathematical principles. This diversity allows us to:
+# 
+# 1. Assess how different learning paradigms perform on this specific healthcare problem
+# 2. Identify which modeling approach offers the best balance between precision and recall
+# 3. Understand the trade-offs between interpretability and predictive power
+# 
+# The models we selected include:
+# 
+# - **Logistic Regression** – a linear, interpretable baseline model
+# - **Random Forest** – an ensemble of decision trees that captures feature interactions
+# - **Neural Network (MLP)** – a deep learning model that handles complex, non-linear patterns
+# - **XGBoost** – a state-of-the-art gradient boosting model for structured data
+# - **Hierarchical Clustering** – an unsupervised method to detect natural patient subgroups
+# 
+# We present the models in order of increasing complexity — from interpretable linear models to more flexible "black box" approaches.
+# For each supervised algorithm, we trained and evaluated two versions:
+# one using the original imbalanced data, and one using a SMOTE-balanced dataset.
+# 
+# This dual evaluation helps us understand how class imbalance impacts model performance,
+# especially in a healthcare context where missing a positive case could have serious consequences.
+# 
+# 
+# ## Data Preparation for Modeling
+# Before training our models, we prepare the dataset to ensure effective learning and fair evaluation.
+# This involves transforming categorical variables, handling severe class imbalance, and scaling numerical features —
+# all essential for stable model performance.
+#%% md
+# ### Splitting and Encoding the Data
+# We begin by converting categorical variables into numerical format.
+# Binary variables (e.g., Smoking, Stroke) are mapped to 0/1, while multi-category features are transformed using `LabelEncoder`.
+# 
+# We then split the data into **features (X)** and **target (y)**, and divide it into **training (80%)** and **test (20%)** sets.
+# 
 #%%
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
@@ -989,7 +1355,13 @@ y = df['HeartDisease']
 # Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 #%% md
-# ## Apply SMOTE to Training Data
+# ### Addressing Class Imbalance with SMOTE
+# As seen in the EDA, the dataset is highly imbalanced — only 8.6% of samples are labeled as having heart disease.
+# This can lead models to ignore the minority class.
+# 
+# To correct for this, we apply **SMOTE** (Synthetic Minority Over-sampling Technique),
+# which generates synthetic samples of the minority class based on feature-space similarities.
+# 
 #%%
 # Apply SMOTE to balance the training dataset
 smote = SMOTE(random_state=42)
@@ -1017,9 +1389,15 @@ plt.ylabel('Count')
 plt.tight_layout()
 plt.show()
 #%% md
-# The SMOTE balancing transformed your highly imbalanced dataset from approximately a 10.7:1 ratio (233,802 negative vs 21,846 positive cases) to a perfectly balanced 1:1 distribution with 233,802 samples in each class. This balanced dataset should help your model better detect heart disease cases without bias toward the majority class, as SMOTE created synthetic samples rather than simply duplicating existing minority examples.
+# SMOTE transformed the dataset from an approximate 10.7:1 imbalance
+# to a perfectly balanced 1:1 ratio — with 233,802 samples in each class in the training set.
+# 
+# This ensures that the model is exposed equally to both outcomes during training, improving its ability to detect heart disease cases.
+# 
 #%% md
-# ## Scale Features
+# ### Feature Scaling
+# After balancing, we apply feature scaling to all numeric columns to bring them to a similar range,
+# which is especially important for distance-based models and neural networks.
 #%%
 # Scale numeric features
 scaler = StandardScaler()
@@ -1032,33 +1410,17 @@ print(f"y_train_balanced shape: {y_train_balanced.shape}")
 print(f"X_test_scaled shape: {X_test_scaled.shape}")
 print(f"y_test shape: {y_test.shape}")
 #%% md
-# The data preparation is now complete and ready for model training. Our balanced training dataset consists of 467,604 samples with 15 features after SMOTE application. The balanced target variable matches this with 467,604 labels. Our test dataset contains 63,913 samples with the same 15 features, which remained unbalanced to represent real-world data distribution. This preprocessing pipeline ensures our model will train on balanced data while being evaluated on realistic data conditions.
+# The balanced training set now contains **467,604 samples** and **15 features**,
+# while the unbalanced test set retains its original distribution with **63,913 samples**.
+# 
+# This setup allows the model to learn from balanced data while being evaluated on realistic, real-world class distributions.
 #%% md
-# Now we'll train and evaluate models using both datasets,
-# always testing on the original imbalanced test data to reflect real-world conditions
+# ## Supervised Learning Models
 #%% md
-# # Model Building and Algorithm Selection
+# ### Logistic Regression
+# We begin with **logistic regression**, a simple yet powerful linear model often used as a baseline for binary classification tasks.
 # 
-# In this phase, we implemented a variety of machine learning algorithms from different families to predict heart disease risk. We strategically selected diverse algorithms that employ fundamentally different mathematical techniques. This approach allows us to:
-# 
-# 1. Assess how different learning paradigms perform on this specific healthcare problem
-# 2. Identify which modeling approach offers the best balance of precision and recall for heart disease detection
-# 3. Understand the trade-offs between interpretability and predictive power
-# 
-# We selected the following algorithms, each representing a different modeling family:
-# 
-# - **Logistic Regression**: A linear model that serves as our baseline and offers high interpretability
-# - **Random Forest**: An ensemble of decision trees that captures non-linear relationships and feature interactions
-# - **Neural Network (MLP)**: A deep learning approach that can model complex patterns without explicit feature engineering
-# - **XGBoost**: A gradient boosting framework that excels at structured data and usually achieves state-of-the-art performance on tabular datasets
-# - **Hierarchical Clustering**: An unsupervised learning approach to identify natural groupings in our dataset without using the target variable
-# 
-# Our presentation follows a logical progression from simpler to more complex algorithms, reflecting the historical development of machine learning techniques while also moving from highly interpretable models to more "black box" approaches. This pedagogical structure allows us to examine how increasing model complexity affects predictive performance, particularly for detecting the minority class (heart disease cases).
-# 
-# For each supervised algorithm, we trained and evaluated two versions: one using the original imbalanced dataset and another using SMOTE-balanced data. This allowed us to assess how class balancing affects each model's ability to identify heart disease cases, which is critical in healthcare applications where failing to detect a positive case could have serious consequences.
-#%% md
-# # Logistic Regression
-# Implement a logistic regression model as our baseline classifier for predicting heart disease, as it's effective for binary classification problems.
+# Its high interpretability and straightforward implementation make it a good starting point for evaluating how well the features in our dataset can distinguish between individuals with and without heart disease.
 # 
 #%%
 from sklearn.linear_model import LogisticRegression
@@ -1113,11 +1475,16 @@ plt.ylim(0, 1)
 
 plt.show()
 #%% md
-# The classification report reveals significant class imbalance issues in our model's performance. While achieving a misleadingly high overall accuracy of 0.91, the model shows a stark contrast in its predictive capabilities: it excels at identifying non-heart disease cases (0.92 precision, 0.99 recall) but performs poorly in detecting heart disease cases (0.52 precision, 0.09 recall). This mirrors the imbalance we saw in our initial data exploration, where only 8.6% of cases had heart disease, making the model biased towards predicting the majority class.
-#%% md
-# # Random Forest
-# Implement a Random Forest classifier to capture complex interactions between health variables and provide feature importance rankings.
+# The model achieved a high overall accuracy (0.91), but this number is misleading due to the class imbalance.
+# It performed well on the majority class (non-heart disease) with 0.99 recall, but poorly on detecting heart disease cases — with recall dropping to just 0.09.
 # 
+# This confirms the concern raised in the EDA: with only 8.6% of cases labeled positive, the model tends to ignore minority cases unless we address the imbalance directly.
+#%% md
+# ### Random Forest
+# Next, we apply a **Random Forest**, an ensemble model based on decision trees.
+# This model captures non-linear relationships and feature interactions that logistic regression may miss.
+# 
+# It also provides feature importance rankings, helping us understand which variables contribute most to prediction.
 #%%
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
@@ -1173,9 +1540,11 @@ plt.show()
 #%% md
 # The Random Forest classifier demonstrates strong performance metrics with an overall accuracy of 0.90. For heart disease detection, it achieves a precision of 0.32 and recall of 0.15. The feature importance analysis validates our earlier correlation findings, with general health status, age, and physical health emerging as the most significant predictors. This aligns with medical understanding of heart disease risk factors.
 #%% md
-# # Neural Network
-#%% md
-# To further diversify our algorithmic approaches, we implemented a Multi-Layer Perceptron (MLP) neural network. Neural networks can capture complex non-linear relationships between variables, making them potentially valuable for heart disease prediction where risk factors may interact in intricate ways. Our model architecture consists of an input layer corresponding to our health metrics, two hidden layers (100 and 50 neurons respectively) for learning complex patterns, and a single output neuron for binary classification. Below we visualize this architecture before examining the model's performance on both balanced and imbalanced datasets.
+# ### Neural Network
+# To explore a more flexible, non-linear modeling approach, we implemented a **Multi-Layer Perceptron (MLP)** neural network.
+# This architecture is well-suited for capturing complex interactions between features, especially in high-dimensional health data.
+# 
+# We used two hidden layers (100 and 50 neurons), and tested the model on both imbalanced and SMOTE-balanced datasets to evaluate its sensitivity to data distribution.
 #%%
 from matplotlib.patches import Circle, FancyArrowPatch
 
@@ -1324,13 +1693,18 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
 #%% md
-# The MLP neural network exhibited unique behavior compared to other models, with dramatic changes before and after implementing SMOTE. The original model suffered from extreme imbalance, with a low sensitivity of only 11% for heart disease cases despite an overall accuracy of 92%, indicating significant bias toward the majority class. After SMOTE, a complete reversal occurred - sensitivity soared to 65%, while precision dropped to 20%, with a significant improvement in the F1 score (from 0.18 to 0.30).
-# Compared to other models in the study, the neural network demonstrates heightened sensitivity to data balancing techniques, a characteristic that distinguishes this algorithm family. While models like Random Forest showed only moderate improvement after SMOTE, the neural network responded much more dramatically. This phenomenon stems from the unique architecture of neural networks, allowing them to learn complex patterns and relationships between variables. With balanced data, the network better learned heart disease characteristics, though with a tendency toward overgeneralization. In the medical context of heart disease detection, the SMOTE-enhanced model may be preferred using a "better safe than sorry" approach, as it identifies more potential cases, even at the cost of false alarms. The flexibility and ability of neural networks to learn complex, non-linear patterns make them a valuable tool in health data analysis, but require careful tuning of hyperparameters and data balancing techniques.
+# The neural network's performance changed dramatically before and after SMOTE:
+# - Without balancing, recall for heart disease was only 11%, despite high overall accuracy.
+# - After SMOTE, recall jumped to 65%, showing much better detection of heart disease cases — though precision dropped to 20%.
+# 
+# This sharp contrast highlights how neural networks are especially sensitive to data imbalance.
+# Compared to other models, the MLP learned more complex patterns from the balanced data, making it effective for early risk detection — even at the cost of some false positives.
+# 
 #%% md
-# # XGBoost
-# Implement an XGBoost classifier which uses gradient boosting with decision trees. This advanced algorithm combines multiple weak prediction models to create a stronger predictive model, with regularization techniques to prevent overfitting. XGBoost is known for its performance, speed, and ability to handle complex patterns.
+# ### XGBoost
+# We then applied **XGBoost**, a gradient boosting model known for its speed, regularization, and strong performance on structured data.
 # 
-# 
+# Its iterative tree-based optimization allows it to capture both linear and non-linear patterns, often outperforming other models on tabular datasets.
 #%%
 from xgboost import XGBClassifier
 from sklearn.metrics import classification_report, precision_score, recall_score, f1_score
@@ -1383,18 +1757,32 @@ plt.ylim(0, 1)
 
 plt.show()
 #%% md
-# The XGBoost model demonstrated a pattern similar to other models, with significant improvement in heart disease detection after balancing the data using SMOTE. Before SMOTE, the model achieved high overall accuracy (0.92) but struggled to identify heart disease cases with very low recall of 0.08, though precision for positive cases was relatively good (0.57). After data balancing with SMOTE, there was a substantial change in performance: the recall for heart disease detection dramatically increased to 0.73 (a 9.1-fold improvement), but at the cost of reduced precision to 0.20.
+# Before SMOTE, XGBoost performed similarly to the other models — high accuracy (0.92) but very low recall (0.08) for heart disease.
+# After SMOTE, recall soared to 0.73, while precision fell to 0.20 — a tradeoff we also saw in the MLP.
 # 
-# These results highlight XGBoost's strong ability to learn from balanced data, as it shows a better balance between precision and recall compared to Random Forest, which achieved lower recall (0.35) but similar precision (0.20). XGBoost demonstrates similar recall to the high recall of the Logistic Regression model (0.73), positioning it as one of the better solutions in terms of heart disease detection capability among the models tested.
+# With an F1-score of 0.32 after balancing, XGBoost emerged as one of the strongest models for detecting heart disease, offering a solid balance between sensitivity and overall performance.
 # 
-# The F1-score of 0.32 (after SMOTE) indicates a significant improvement compared to 0.15 (before SMOTE), demonstrating the importance of addressing data imbalance. While XGBoost emerges as one of the best performing models in this comparison, it's important to note that a precision of 0.20 still means 80% of its positive predictions are false alarms. In summary, XGBoost offers an advanced boosting approach that provides a good balance between identifying heart disease cases and minimizing false alarms relative to other models tested, making it a valuable addition to the range of models in the project.
 #%% md
-# # Hierarchical Clustering
-# - Perform hierarchical clustering to identify natural groupings in our health data, using Gower distance to handle mixed numeric and categorical variables.
-# - Creates 5 distinct clusters of patients
-# - Provides cluster sizes and characteristics
-# - Shows mean/mode values of features in each cluster
-# - Helps identify natural groupings of patients with similar health profiles
+# ## Unsupervised Analysis
+# 
+# While supervised models rely on labeled data to learn patterns and make predictions,
+# unsupervised techniques like clustering help us uncover natural groupings in the data —
+# without using predefined outcome labels.
+# 
+# In this section, we apply **hierarchical clustering** to identify distinct patient profiles based on shared health characteristics.
+# This complementary analysis allows us to explore whether meaningful risk groups emerge from the data structure itself,
+# and whether these clusters align with known heart disease risk.
+# 
+# ### Hierarchical Clustering of Patient Profiles
+# 
+# Hierarchical clustering groups individuals based on similarity across multiple features, using **Euclidean  distance** to handle a mix of numeric and categorical variables.
+# 
+# This technique allows us to discover naturally occurring subpopulations —
+# which may help in designing targeted prevention strategies or refining future predictive models.
+# 
+# We analyze the results both **before and after applying SMOTE**, to understand how class imbalance affects the formation and interpretation of these clusters.
+# 
+# 
 #%%
 import pandas as pd
 from sklearn.cluster import AgglomerativeClustering
@@ -1420,7 +1808,7 @@ else:
     X_train_sample = X_train[sample_indices]
     y_train_sample = y_train[sample_indices]
 
-# Calculate distance matrix (using euclidean distance for symmetric matrix)
+# Calculate distance matrix (using Euclidean distance for symmetric matrix)
 distances_orig = pairwise_distances(X_train_sample, metric='euclidean')
 
 # Make sure the matrix is symmetric
@@ -1455,7 +1843,7 @@ else:
     X_train_balanced_sample = X_train_balanced[balanced_sample_indices]
     y_train_balanced_sample = y_train_balanced[balanced_sample_indices]
 
-# Calculate distance matrix (using euclidean distance for symmetric matrix)
+# Calculate distance matrix (using Euclidean distance for symmetric matrix)
 distances_balanced = pairwise_distances(X_train_balanced_sample, metric='euclidean')
 
 # Make sure the matrix is symmetric
@@ -1534,16 +1922,32 @@ for bar, percentage in zip(bars_bal, heart_disease_by_cluster_bal):
 plt.tight_layout()
 plt.show()
 #%% md
-# The hierarchical clustering analysis of heart disease data revealed distinct patient groups based on health characteristics. Before SMOTE balancing, clusters showed moderate differences in disease rates (7.1%-26.9%), with one cluster identifying higher-risk patients. After SMOTE, disease prevalence increased dramatically across all clusters (45.5%-72.3%), with significantly higher rates across all groups.
+# The clustering revealed five distinct patient profiles.
+# In the original, imbalanced data, heart disease rates varied modestly across clusters (7.1%–26.9%).
+# After SMOTE, these rates increased substantially (45.5%–72.3%), with clearer separation between risk levels.
 # 
-# The bottom graphs display heart disease rates in each cluster - the left graph shows the original data with lower rates reflecting the natural imbalance in the data, while the right graph presents the disease distribution after SMOTE with significantly higher values highlighting how the balancing technique enables better identification of risk groups.
+# The dendrograms showed how balancing influenced the clustering structure, enabling more meaningful groupings.
+# The bottom graphs illustrate how SMOTE clearly amplifies distinctions between clusters, making risk groups more identifiable.
 # 
-# The dendrograms illustrate the hierarchical cluster structure and demonstrate how data balancing affects natural grouping. The more uniform structure after SMOTE suggests that the balanced dataset allows the algorithm to identify more nuanced relationships between features rather than being dominated by the majority class. Notably, the cluster with 72.3% heart disease rate likely represents patients sharing critical risk factors that strongly correlate with cardiac conditions.
-# 
-# This unsupervised analysis complements our supervised models by identifying natural relationships between features without relying on predefined labels. The clear stratification of risk groups could enable healthcare providers to develop targeted prevention strategies for specific patient profiles, potentially improving early intervention for those in higher-risk clusters. Furthermore, these distinct clusters may inform feature selection for future predictive models, focusing on the characteristics that most effectively distinguish between risk groups.
+# These clusters likely represent patients sharing critical risk factors, which could guide targeted interventions or future feature selection.
+# Overall, this analysis complements our supervised models by identifying natural risk strata—potentially guiding future interventions or model refinement.
 #%% md
-# # Comparing the Models
-# After training multiple models from different algorithm families, we observed distinct patterns in their performance characteristics. The figure below compares the precision, recall, and F1-score for heart disease detection across all models after SMOTE balancing.
+# # 4. Model Comparison and Interpretation
+# 
+# After training multiple machine learning models, we now shift our focus to evaluating their performance side by side.
+# This includes comparing predictive accuracy, recall, precision, and F1-scores for detecting heart disease — particularly under the impact of SMOTE balancing.
+# 
+# We also examine **model interpretability**, both at the global level using feature importance (via SHAP),
+# and at the individual level through case-specific SHAP analysis that helps us understand how decisions are made for specific patients.
+# 
+# ## Comparing Model Performance Metrics
+# 
+# To assess how well each model handles heart disease detection, we compare the **precision**, **recall**, and **F1-score**
+# for each classifier on the **SMOTE-balanced** test set.
+# 
+# The following chart summarizes these metrics, focusing on the minority class (heart disease cases).
+# 
+# 
 # 
 #%%
 import pandas as pd
@@ -1585,31 +1989,34 @@ plt.legend(title='Metric', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 plt.show()
 #%% md
-# # Model Summary and Analysis
+# ## Summary of Model Performance
 # 
-# When comparing the models' performance after SMOTE balancing, we observed distinct patterns in how these diverse algorithm families approach the heart disease prediction task.
+# Comparing the models reveals clear differences in how each algorithm handles the trade-off between sensitivity (recall) and specificity (precision):
 # 
-# **__Random Forest__** emerged as the best performer in terms of overall accuracy (**0.82**), but its precision for heart disease cases dropped to **0.20**, making it less cautious in labeling patients as having heart disease than initially thought. While it still maintains a relatively high F1-score (**0.26**), it no longer leads in balancing precision and recall, as the emphasis on accuracy seems to have led to more false positives for heart disease detection.
+# - **XGBoost** emerged as the most balanced model, with an F1-score of 0.32 — combining a strong recall (0.73) with moderate precision (0.20).
+# - **Logistic Regression** achieved the highest recall (0.73), making it effective for catching more heart disease cases, though at the cost of precision (0.19).
+# - **Neural Network** showed slightly weaker performance with recall of 0.65 and an F1-score of 0.30.
+# - **Random Forest**, while yielding the highest overall accuracy (0.82), had lower recall (0.15) for heart disease, making it less suitable when sensitivity is critical.
 # 
-# **__Logistic Regression__** demonstrated a recall of **0.73** for heart disease cases, making it effective at identifying positive cases, though with a low precision of **0.19**. This trade-off resulted in an F1-score of **0.30**, showing that it prioritizes detecting heart disease cases at the cost of more false positives. Its performance is useful in contexts where detecting as many cases as possible is critical, even at the risk of misclassifying some healthy individuals.
+# Despite the improvements brought by SMOTE, all models still performed significantly better on the majority class (non-heart disease),
+# with F1-scores ranging from 0.81 to 0.92 — compared to 0.26 to 0.32 for heart disease cases.
 # 
-# **__Neural Network__** saw a significant drop in recall (**0.65**, down from 0.76 in previous results), reducing its effectiveness in identifying heart disease cases. While it maintains a relatively high precision (**0.20**) compared to **__Logistic Regression__**, its F1-score (**0.30**) suggests it is no longer as competitive in recall-driven scenarios. The neural network’s performance seems to have decreased, possibly due to overfitting or insufficient model tuning.
+# These results reflect the inherent challenge of predicting rare medical conditions, and emphasize the need to balance recall with precision in real-world applications.
 # 
-# **__XGBoost__** provided the best balance between precision (**0.20**) and recall (**0.73**), resulting in an F1-score (**0.32**) that closely matches the top performers. This makes it a strong compromise model when balancing sensitivity and specificity is crucial. XGBoost shows that it can adapt better than other models when a balance between avoiding false positives and maximizing recall is needed.
-# 
-# Despite applying SMOTE to address class imbalance, all models still showed significantly better performance for non-heart disease cases (**F1 scores between 0.81-0.92**) compared to heart disease cases (**F1 scores between 0.26-0.32**). While SMOTE improved recall for heart disease cases, the challenge of accurately detecting them remains. This highlights the difficulty of detecting heart disease with precision in imbalanced datasets.
-# 
-# Our analysis reveals that these diverse modeling approaches capture different aspects of the heart disease prediction problem. The linear approach (**__Logistic Regression__**) remains useful for maximizing recall, while **__Neural Network__** is now less competitive. Tree-based methods (**__Random Forest__** and **__XGBoost__**) demonstrate varying trade-offs between precision and recall, with **__XGBoost__** emerging as the most balanced option for real-world applications.
-# 
-# Ultimately, the choice between these models depends on clinical priorities:
-# - **If maximizing recall is most important** → **__Logistic Regression__** (0.73 recall) is preferable, despite its lower precision.
-# - **If balancing precision and recall is key** → **__XGBoost__** (F1-score 0.32) is the best choice for a more balanced approach.
-# - **If prioritizing high accuracy and minimizing false positives** → **__Random Forest__** is a safer option, though it may result in fewer heart disease cases being detected.
-#%% md
-# # Interpretability of the Models
+# **Practical recommendations** based on modeling goals:
+# - If **maximizing recall** is most important (e.g., screening), choose **Logistic Regression**.
+# - If **balancing precision and recall** is the goal, **XGBoost** provides the best overall compromise.
+# - If **minimizing false positives** is the priority, **Random Forest** may be more appropriate — though at the cost of missing more true cases.
 # 
 #%% md
-# After testing and comparing different classification models for heart disease prediction, we want to understand which variables most significantly influenced our models' behavior. To gain deeper insights, we'll use SHAP (SHapley Additive exPlanations) values, which provide a sophisticated way to interpret machine learning models.
+# ## Global Model Interpretability with SHAP
+# 
+# To understand which features influenced our model predictions, we applied **SHAP (SHapley Additive exPlanations)** —
+# a model-agnostic method for interpreting complex machine learning outputs.
+# 
+# The SHAP summary plot below ranks features by their overall impact on the model's predictions,
+# and shows how different feature values push the prediction toward higher or lower risk.
+# 
 #%%
 import shap
 import os
@@ -1641,20 +2048,25 @@ finally:
 # Create beeswarm plot
 shap.plots.beeswarm(shap_values)
 #%% md
-# The plot above sorts features by the sum of SHAP value magnitudes over all samples, and uses these values to show the distribution of impacts each feature has on the model output. Colors represent the feature value (red high, blue low). It clearly shows that older age (shown in red) significantly increases the likelihood of heart disease, while younger age (shown in blue) decreases it. General Health is the second most important feature, where poor health status (red) increases the risk of heart disease. Interestingly, feature like physical activity show more moderate effect on the model's output.
+# The summary plot shows that **age** is the most influential feature:
+# higher age (red) significantly increases the risk of heart disease, while younger age (blue) reduces it.
+# 
+# **General Health** is the second most impactful feature, with poor health ratings increasing risk.
+# Other contributors include **physical activity**, **diabetes**, and **smoking**, each playing a role in how the model evaluates risk.
+# 
 #%% md
-# ## Enhancing SHAP Analysis: Case-Specific Investigation
-# So far, we performed basic SHAP analysis showing the overall feature importance in our model, as seen in the summary plot. This analysis provided general insights regarding the impact of each feature, identifying age category, general health status, sex, smoking, and stroke history as the most influential predictors for heart disease.
-# However, this general analysis doesn't explain how the model arrives at decisions for specific cases. To deepen our understanding and examine the model's decision-making process at the individual level, we'll now extend our SHAP analysis using Waterfall plots.
+# ## Individual-Level SHAP Analysis
 # 
-# We'll select four representative cases from our test set:
+# While the global SHAP summary shows overall feature importance, it does not explain individual predictions.
+# To address this, we performed case-specific SHAP analysis using **Waterfall plots** for four representative patients:
 # 
-# True Positive: A patient with heart disease correctly identified by the model
-# True Negative: A patient without heart disease correctly identified
-# False Positive: A patient without heart disease incorrectly classified as having heart disease
-# False Negative: A patient with heart disease the model failed to identify
+# 1. **True Positive** – Correctly identified heart disease case
+# 2. **True Negative** – Correctly identified healthy case
+# 3. **False Positive** – Incorrectly flagged healthy patient
+# 4. **False Negative** – Missed heart disease case
 # 
-# For each case, we'll calculate specific SHAP values and create a Waterfall plot showing how each feature contributed to the final prediction.
+# These plots reveal how specific features influenced each individual decision — helping us understand model behavior in real-world contexts.
+# 
 #%%
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -1756,28 +2168,100 @@ from IPython.display import Image, display
 for case_type in case_labels:
     display(Image(filename=f"case_{case_type.replace(' ', '_')}.png"))
 #%% md
-# # Analysis of SHAP Results for Specific Cases
+# ## Interpretation of Individual Model Decisions
 # 
-# The expanded SHAP analysis we conducted provides important insights into how the model makes decisions at the individual patient level. While the general graph showed us the importance of features globally, analyzing individual cases allows us to understand the dynamics of the model's decision-making process.
+# The SHAP Waterfall plots offer a deeper view into how the model processes feature contributions:
 # 
-# In the case of correct heart disease identification <u>**True Positive**</u> with a probability of 75.7%, we can see that the most significant factor pushing the prediction toward positive was **AgeCategory** with a substantial contribution of +0.65. **GenHealth** also contributed significantly (+0.65), and **Diabetic** added another positive influence (+0.32). Despite a small negative contribution from **Sex** (-0.14), these strong positive factors successfully led to the correct prediction of heart disease, showing how the model identifies classic risk profiles.
+# - In the **True Positive**, strong contributions from **Age**, **GenHealth**, and **Diabetic** pushed the prediction above the threshold.
+# - In the **True Negative**, protective factors like young age, good general health, and low asthma impact led to a low predicted probability.
+# - The **False Positive** case showed overreliance on GenHealth and PhysicalActivity, potentially overestimating risk despite contradictory signals like asthma.
+# - The **False Negative** case involved a patient with good health indicators that offset risk signals from age and other factors — leading to a missed prediction.
 # 
-# In contrast, in the case of correctly identifying the absence of heart disease <u>**True Negative**</u> with a very low probability of 3.7%, the model relied on several protective factors. **AgeCategory** provided a negative contribution (-1.02), supported by **GenHealth** (-0.75), **Asthma** (-0.55), and **MentalHealth** (-0.6). This consistent pattern of negative contributions demonstrates how the model effectively recognizes patients with low risk profiles.
-# 
-# The analysis of incorrect cases teaches us about the model's weaknesses. In the case of a false positive prediction <u>**False Positive**</u> with a probability of 71.2%, **GenHealth** was the decisive factor (+0.62), followed closely by **PhysicalActivity** (+0.49) and **Diabetic** (+0.46). Interestingly, **Asthma** provided a negative contribution (-0.45), but this wasn't enough to overcome the combined positive influence of the other factors. This suggests the model may overweight certain health indicators even when they don't necessarily translate to heart disease.
-# 
-# The case of a false negative prediction <u>**False Negative**</u> with a probability of 35.9% reveals complex interactions. Here, **GenHealth** strongly pushed toward a negative prediction (-0.94), while **PhysicalActivity** also contributed negatively (-0.26). However, **AgeCategory** (+0.22) and a small contribution from other features (+0.09) pushed in the positive direction, though not enough to overcome the negative factors. Despite having heart disease, this patient likely presented with good general health indicators that misled the model.
-# 
-# From analyzing these four cases, we see that the model consistently relies on **AgeCategory** and **GenHealth** as primary factors, with **Diabetic**, **PhysicalActivity**, and **Asthma** playing important secondary roles. The model performs well with classic risk profiles but struggles with cases showing contradictory signals, such as patients with heart disease despite good general health or patients without heart disease who have some risk factors.
-# 
-# These findings suggest directions for future model improvement, particularly in handling cases with mixed signals. The model might benefit from more sophisticated weighting of risk factors when they present in unusual combinations, and from better recognition of atypical presentations of heart disease.
-# 
-# SHAP analysis at the individual case level demonstrates the importance of looking beyond statistical performance metrics and provides valuable clinical insights that can help physicians assess the accuracy of model predictions in different scenarios.
+# These examples illustrate both the model’s strengths in identifying classic risk profiles, and its limitations in handling edge cases with mixed indicators.
+# They also highlight opportunities to improve model robustness and reduce misclassification in future iterations.
+# Future improvements might focus on better handling of unusual risk factor combinations and atypical disease presentations.
 #%% md
-# # Summary and Thoughts for the future and Final Taught
-# In this study, we embarked on a data-driven journey to uncover the underlying factors contributing to heart disease risk. Beginning with a comprehensive dataset containing various lifestyle and health attributes, we carefully preprocessed the data to ensure consistency and accuracy. This involved encoding categorical variables, organizing age groups into meaningful ranges, and transforming binary responses for better analysis. We also handled missing values, normalized numerical features, and engineered new variables to enhance model performance. For instance, age groups were restructured into broader 10-year ranges to capture more meaningful patterns, and binary health indicators such as smoking, alcohol consumption, and physical activity were mapped to numerical values. With a structured dataset in place, we conducted exploratory data analysis through visualizations, revealing key trends and correlations between lifestyle choices and heart disease prevalence.
+# # 5. Final Reflections and Future Directions
 # 
-# Building upon these insights, we implemented machine learning models, including logistic regression and decision trees, to predict heart disease risk based on the identified factors. We applied various data transformation techniques, such as feature scaling and one-hot encoding, to optimize model performance. Additionally, we experimented with different feature selection methods to identify the most impactful predictors, analyzing how factors like kidney disease, stroke history influenced heart disease risk. We evaluated models using accuracy, precision, recall, and F1-score.
+# ## From Data to Impact: Reconnecting with David
 # 
-# Despite extensive preprocessing and optimization, the prediction accuracy remained suboptimal. This suggests that heart disease risk may be influenced by additional factors not captured in the dataset, such as genetic predisposition, environmental conditions, or complex interactions between variables. Moreover, the dataset itself may not be sufficiently detailed or diverse, potentially limiting the model's ability to generalize effectively. Class imbalances, particularly in the distribution of positive heart disease cases, and potential biases in the data may have further impacted the results. While our models offer a foundational approach for risk assessment, further research with more diverse, high-quality data and advanced techniques, such as ensemble learning, or feature engineering based on medical expertise, is needed to improve predictive performance. Nonetheless, our findings contribute to the ongoing exploration of data-driven healthcare solutions and highlight the challenges of predicting complex medical conditions using machine learning.
+# At the start of this journey, we imagined David — a man in his 50s, seemingly healthy, but at risk for heart disease.
+# Our goal was to understand whether data alone could have warned him earlier, and how machine learning might help identify people like him before it's too late.
+# 
+# This project set out to explore that question through real data, rigorous analysis, and modern predictive tools.
+# 
+# ---
+# 
+# ## What We Did
+# 
+# We began with a large and detailed dataset, rich in lifestyle, demographic, and health-related features.
+# After careful preprocessing — including encoding variables, restructuring age groups, filtering out noise, and balancing classes — we built a clean, consistent foundation for analysis.
+# 
+# Our exploratory data analysis revealed key trends:
+# - Heart disease risk rises with age, poor general health, diabetes, and stroke history.
+# - Lifestyle choices like physical activity and smoking play a measurable role.
+# - Variables like sleep duration and race had little predictive value, and were removed.
+# 
+# We then trained and evaluated multiple machine learning models — from interpretable logistic regression to complex neural networks and gradient boosting.
+# We tested both imbalanced and SMOTE-balanced datasets to understand how sensitivity to minority classes changes across models.
+# 
+# ---
+# 
+# ## What We Learned
+# 
+# Some key insights emerged:
+# 
+# - **XGBoost** offered the best balance of recall and precision for detecting heart disease.
+# - **Logistic Regression** was best when the priority is catching as many positive cases as possible.
+# - **Neural Networks** were sensitive to data balancing, performing well with SMOTE but poorly without.
+# - **Random Forest**, while highly accurate overall, was less effective in identifying high-risk individuals.
+# 
+# We also found that **no model could overcome the limitations of the data** entirely.
+# Heart disease prediction is fundamentally difficult — not just due to class imbalance, but because real-world risk is shaped by genetics, environment, and subtle interactions not captured in survey data.
+# 
+# ---
+# 
+# ## Beyond the Metrics: What SHAP Taught Us
+# 
+# Using SHAP analysis, we moved beyond performance metrics and into the **reasoning** behind model decisions.
+# 
+# - Globally, **age** and **general health** were the strongest drivers of prediction.
+# - On the individual level, SHAP revealed how combinations of features — such as smoking, diabetes, or asthma — tipped the model's decision one way or the other.
+# - We saw where the model succeeded… and where it failed — especially in edge cases with mixed signals.
+# 
+# These insights help us not only build better models, but also **trust** them — a critical requirement in medical applications.
+# 
+# ---
+# 
+# ## Final Thoughts: What This Means for David — and for Us
+# 
+# If David had access to a model like ours, would it have caught his risk in time?
+# 
+# Maybe.
+# If he had reported poor general health, a stroke history, or difficulty walking, the model likely would have raised a flag.
+# But if he seemed relatively healthy on the surface — as many people do — it might have missed him entirely.
+# 
+# That’s the core tension in predictive health:
+# **We can build good models, but no model is perfect.**
+# 
+# Still, every false positive we accept may be a real life we save.
+# In medicine, it's often better to **flag too many** than to miss the one.
+# 
+# ---
+# 
+# ## Looking Forward
+# 
+# This project taught us a lot — about data, modeling, and most importantly, about the **limitations and potential** of machine learning in healthcare.
+# 
+# To improve further, future work might include:
+# - Richer datasets with genetic, environmental, or clinical markers
+# - Temporal data (changes over time)
+# - Collaboration with medical professionals for guided feature engineering
+# - Ensemble or hybrid models that blend interpretability with performance
+# 
+# ---
+# 
+# ## Closing Note
+# 
+# While no model is perfect, every step toward better prediction brings us closer to personalized, preventive care — where data and medicine work hand in hand.
 # 
